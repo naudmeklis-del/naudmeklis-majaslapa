@@ -1,0 +1,426 @@
+@font-face {
+  font-family: "RegloBold";
+  src: url("fonts/RegloBold.woff2") format("woff2"),
+       url("fonts/RegloBold.woff") format("woff");
+  font-weight: bold;
+  font-style: normal;
+}
+
+@media (max-width: 600px) {
+  .logo { height: 36px; }
+
+  .pieslegties-btn,
+  .pievienot-btn,
+  .manisludinajumi-btn,
+  .iziet-btn {
+    padding: 8px 10px;
+    font-size: 14px;
+  }
+}
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  font-family: "DM Sans", sans-serif;   /* pamatfonts visai lapai */
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;      /* ekrāna augstums, kas ņem vērā telefona adreses joslu */
+}
+
+
+.logo {
+  height: 45px;   /* logotipa augstums */
+  width: auto;    /* platums pielāgojas pats, lai attēls neizkropļojas */
+}
+/* Augšējā josla ar pogām, 70px augsta */
+.josla {
+  flex-shrink: 0;
+  min-height: 70px;
+  background: #FAF5FA;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;     /* ja pogas netiek, tās pārnesas uz nākamo rindu */
+  gap: 8px;
+  padding: 8px 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Karte aizņem visu atlikušo vietu: ekrāna augstums mīnus josla */
+#karte {
+  flex: 1;             /* aizņem visu vietu zem joslas */
+}
+
+/* Pin'a forma */
+.pins {
+  width: 36px;
+  height: 36px;
+  background: #5b2a9e;
+  border: 3px solid white;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* € zīmi pagriežam atpakaļ, lai tā stāv taisni */
+.pins span {
+  transform: rotate(45deg);
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+/* Popup logs */
+.leaflet-popup-content-wrapper {
+  border-radius: 16px;
+}
+.popup-nosaukums {
+  font-size: 16px;
+  font-weight: bold;
+  color: #3b1a6b;
+}
+.popup-cena {
+  color: #5b2a9e;
+  font-weight: bold;
+}
+.pieslegties-btn {
+  background: #15911f;      /* purple background */
+  color: #FAF5FA;             /* text color */
+  border: none;             /* removes the default border */
+  border-radius: 10px;      /* rounded corners */
+  padding: 10px 16px;       /* space inside: top/bottom, left/right */
+  font-size: 15px;
+  cursor: pointer;         /* hand cursor on hover */
+  font-family: "DM Sans", sans-serif;
+  font-weight: bold;
+}
+
+/* When the mouse is over the button */
+.pieslegties-btn:hover {
+  background: #0a440f;      /* darker purple */
+}
+.pievienot-btn {
+  background: #3C1955;      /* purple background */
+  color: #FAF5FA;             /* text color */
+  border: none;             /* removes the default border */
+  border-radius: 10px;      /* rounded corners */
+  padding: 10px 16px;       /* space inside: top/bottom, left/right */
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;          /* hand cursor on hover */
+  font-family: "DM Sans", sans-serif;
+}
+
+/* When the mouse is over the button */
+.pievienot-btn:hover {
+  background: #281138;      /* darker purple */
+}
+.manisludinajumi-btn {
+  background: #3C1955;      /* purple background */
+  color: #FAF5FA;             /* text color */
+  border: none;             /* removes the default border */
+  border-radius: 10px;      /* rounded corners */
+  padding: 10px 16px;       /* space inside: top/bottom, left/right */
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;          /* hand cursor on hover */
+  font-family: "DM Sans", sans-serif;
+}
+
+/* When the mouse is over the button */
+.manisludinajumi-btn:hover {
+  background: #281138;      /* darker purple */
+}
+.iziet-btn {
+  background: #791414;      /* purple background */
+  color: #FAF5FA;             /* text color */
+  border: none;             /* removes the default border */
+  border-radius: 10px;      /* rounded corners */
+  padding: 10px 16px;       /* space inside: top/bottom, left/right */
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;          /* hand cursor on hover */
+  font-family: "DM Sans", sans-serif;
+}
+
+/* When the mouse is over the button */
+.iziet-btn:hover {
+  background: #3a1111;      /* darker purple */
+}
+
+.popup-apraksts {
+  margin-top: 6px;
+  color: #444;
+  font-size: 14px;
+  max-width: 220px;
+  white-space: pre-wrap;   /* saglabā rindu pārnesumus, ko ierakstīja lietotājs */
+}
+input, select, textarea {
+  font-size: 16px;
+}
+
+dialog {
+  border: none;
+  border-radius: 16px;
+  padding: 20px;
+  width: min(90vw, 420px);
+  box-sizing: border-box;
+  background: white;
+  color: #222;
+}
+
+dialog input,
+dialog select,
+dialog textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px;
+}
+
+.partneri {
+  flex-shrink: 0;            /* lodziņš nesaspiežas */
+  background: #FAF5FA;
+  border-top: 1px solid #e6dcee;
+  padding: 6px 12px;
+  text-align: center;
+  font-size: 90px;
+  color: #3b1a6b;
+  min-height: 90px;
+  box-sizing: border-box;
+}
+
+.partneri small {
+  display: block;
+  font-size: 11px;
+  color: #888;
+}
+
+/* Karte un filtru panelis blakus */
+.saturs {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  position: relative;
+}
+#karte { flex: 1; min-width: 0; }
+
+.filtri-panel {
+  width: 280px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  padding: 16px;
+  background: #F3EAFB;
+  overflow-y: auto;
+}
+.filtri-panel h3 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0;
+  color: #3C1955;
+}
+.filtri-panel label {
+  display: block;
+  margin: 14px 0 6px;
+  font-weight: bold;
+  color: #3C1955;
+}
+.filtri-panel input[type="text"],
+.filtri-panel input[type="number"] {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px;
+  border: 1px solid #cdb9e6;
+  border-radius: 8px;
+}
+.cena-rinda { display: flex; gap: 8px; }
+
+/* Kategoriju "pogas" */
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  background: #E6D9F5;
+  color: #3C1955;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.chip.aktivs { background: #3C1955; color: #FAF5FA; }
+
+.saite-btn {
+  background: none;
+  border: none;
+  color: #5b2a9e;
+  text-decoration: underline;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* Poga "Filtri" datorā nav vajadzīga */
+.filtri-btn { display: none; }
+
+/* Telefonā panelis ir slēpts un atveras virs kartes */
+@media (max-width: 700px) {
+  .filtri-btn { display: inline-block; }
+
+  .filtri-panel {
+    display: none;
+    position: absolute;
+    z-index: 2000;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 85%;
+    max-width: 320px;
+    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.25);
+  }
+  .filtri-panel.atverts { display: block; }
+}
+
+.btn-login {
+  background: #3C1955;      /* purple background */
+  color: #FAF5FA;             /* text color */
+  border: none;             /* removes the default border */
+  border-radius: 10px;      /* rounded corners */
+  padding: 10px 16px;       /* space inside: top/bottom, left/right */
+  font-size: 15px;
+  cursor: pointer;         /* hand cursor on hover */
+  font-family: "DM Sans", sans-serif;
+  font-weight: bold;
+}
+
+/* When the mouse is over the button */
+.btn-login:hover {
+  background: #281138;      /* darker purple */
+}
+
+.btn-aizvert {
+  background: #3C1955;      /* purple background */
+  color: #FAF5FA;             /* text color */
+  border: none;             /* removes the default border */
+  border-radius: 10px;      /* rounded corners */
+  padding: 10px 16px;       /* space inside: top/bottom, left/right */
+  font-size: 15px;
+  cursor: pointer;         /* hand cursor on hover */
+  font-family: "DM Sans", sans-serif;
+  font-weight: bold;
+}
+
+/* When the mouse is over the button */
+.btn-aizvert:hover {
+  background: #281138;      /* darker purple */
+}
+
+.btn-register {
+  background: #3C1955;      /* purple background */
+  color: #FAF5FA;             /* text color */
+  border: none;             /* removes the default border */
+  border-radius: 10px;      /* rounded corners */
+  padding: 10px 16px;       /* space inside: top/bottom, left/right */
+  font-size: 15px;
+  cursor: pointer;         /* hand cursor on hover */
+  font-family: "DM Sans", sans-serif;
+  font-weight: bold;
+}
+
+/* When the mouse is over the button */
+.btn-register:hover {
+  background: #281138;      /* darker purple */
+}
+
+.authdialog-title {
+      /* purple background */
+  color: #000000;             /* text color */       
+  font-size: 15px;     
+  font-family: "DM Sans", sans-serif;
+  font-weight: bold;
+}
+
+/* ===== Visas pogas logos (dialog) bez savas klases =====
+   Tas aptver: Saglabāt, Atcelt (Pievienot haltūru),
+   Aizvērt (Mani sludinājumi) un pogas Saglabāt / Dzēst
+   sludinājumu sarakstā. Pogām ar savu klasi (piem. .btn-login)
+   paliek viņu pašu dizains. */
+dialog button {
+  background: #3C1955;
+  color: #FAF5FA;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: "DM Sans", sans-serif;
+}
+
+dialog button:hover {
+  background: #281138;
+}
+
+
+/* Poga "Ziņot" sludinājuma logā uz kartes */
+.zinot-btn {
+  display: block;
+  margin-top: 8px;
+  padding: 0;
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.zinot-btn:hover {
+  color: #791414;
+}
+
+
+/* ===== DM Sans visur =====
+   Pogas, ievades lauki un Leaflet kartes logi pēc noklusējuma
+   NEmanto lapas fontu, tāpēc tie te tiek piespiesti to darīt. */
+button, input, select, textarea {
+  font-family: inherit;
+}
+
+.leaflet-container,
+.leaflet-popup-content,
+.leaflet-control {
+  font-family: inherit;
+}
+
+
+/* ===== Apakšējā josla (Par mums | Lietošanas noteikumi | Privātuma politika) ===== */
+.footer {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;   /* saites pa vidu */
+  flex-wrap: wrap;           /* šaurā ekrānā pārnesas uz nākamo rindu */
+  gap: 12px;
+  padding: 10px 12px;
+  background: #FAF5FA;
+  border-top: 1px solid #e6dcee;
+  font-size: 14px;
+}
+
+.footer a {
+  color: #3C1955;
+  text-decoration: none;
+}
+.footer a:hover {
+  text-decoration: underline;
+}
+
+/* Svītriņa | starp saitēm (pirms katras saites, izņemot pirmo) */
+.footer a + a::before {
+  content: "|";
+  display: inline-block;     /* lai svītriņa netiktu pasvītrota */
+  margin-right: 12px;
+  color: #cdb9e6;
+}

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <link rel="icon" type="image/x-icon" href="naudmeklislogobezteksta.png">
+  <title>Naudmeklis</title>
+
+  <!-- Fonts: DM Sans (Regular 400 un Bold 700) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Leaflet kartes izskats -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+  <!-- mans izskats -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- Augšējā josla -->
+  <div class="josla">
+    <img src="naudmeklishorizotalilogo.png" class="logo" alt="Naudmeklis">
+    <div>
+      <button id="btn-filtri" class="pievienot-btn filtri-btn">Filtri</button>
+      <button id="btn-mani" style="display: none;" class="manisludinajumi-btn">Mani sludinājumi</button>
+      <button id="btn-pievienot" class="pievienot-btn">Pievienot haltūru</button>
+      <button id="btn-pieslegties" class="pieslegties-btn">Pieslēgties</button>
+      <button id="btn-iziet" style="display: none;" class="iziet-btn">Iziet</button>
+    </div>
+  </div>
+
+  <!-- Šeit parādīsies karte -->
+  <div class="saturs">
+
+  <aside class="filtri-panel" id="filtri-panel">
+    <h3>Filtri <button id="btn-notirit" class="saite-btn">Notīrīt filtrus</button></h3>
+
+    <label for="f-meklet">Meklēt</label>
+    <input type="text" id="f-meklet" placeholder="Meklēt (piem. dizains)">
+
+    <label>Kategorijas</label>
+    <div id="f-kategorijas" class="chips"></div>
+
+    <label>Cena (€)</label>
+    <div class="cena-rinda">
+      <input type="number" id="f-min" placeholder="Min (€)">
+      <input type="number" id="f-max" placeholder="Max (€)">
+    </div>
+
+    <label><input type="checkbox" id="f-apmaksatas"> Rādīt tikai apmaksātās</label>
+
+    <p id="f-rezultati"></p>
+  </aside>
+
+  <div id="karte"></div>
+
+</div>
+  <!-- Reklma -->
+<div class="partneri">
+  <small>Reklāma</small>
+  
+</div>
+
+<footer class="footer">
+  <a href="par-mums.html">Par mums</a>
+  <a href="lietosanas-noteikumi.html">Lietošanas noteikumi</a>
+  <a href="privatuma-politika.html">Privātuma politika</a>
+</footer>
+
+  <dialog id="auth-logs">
+  <h3 class="authdialog-title">Pieslēgšanās | Reģistrācija</h3>
+  <input type="email" id="epasts" placeholder="E-pasts"><br><br>
+  <input type="password" id="parole" placeholder="Parole (vismaz 6 simboli)"><br><br>
+  <button class="btn-login" id="btn-login">Pieslēgties</button>
+  <button class="btn-register" id="btn-register">Reģistrēties</button>
+  <button class="btn-aizvert" id="btn-aizvert">Aizvērt</button>
+  <p id="auth-zinojums"></p>
+</dialog>
+
+<dialog id="haltura-logs">
+  <h3>Pievienot haltūru</h3>
+  <input type="text" id="h-nosaukums" placeholder="Nosaukums"><br><br>
+  <select id="h-kategorija">
+    <!-- Kategorijas tiek ielādētas no app.js (saraksts "kategorijas") -->
+  </select><br><br>
+<input type="number" id="h-cena" placeholder="Cena (€)"><br><br>
+
+<textarea id="h-apraksts" placeholder="Apraksts (kas jādara, kad, kur tieši, kontaktinformācija)" maxlength="500" rows="4" style="width: 100%;"></textarea><br><br>
+
+<button id="btn-saglabat">Saglabāt</button>
+  <button id="btn-atcelt">Atcelt</button>
+  <p id="h-zinojums"></p>
+</dialog>
+
+<dialog id="mani-logs">
+  <h3>Mani sludinājumi</h3>
+  <div id="mani-saraksts"></div>
+  <br>
+  <button id="btn-mani-aizvert">Aizvērt</button>
+</dialog>
+
+<dialog id="zinot-logs">
+  <h3>Ziņot par sludinājumu</h3>
+  <select id="z-iemesls">
+    <option>Krāpniecība</option>
+    <option>Nepiemērots saturs</option>
+    <option>Nepareiza informācija</option>
+    <option>Surogātpasts (spams)</option>
+    <option>Cits</option>
+  </select><br><br>
+  <textarea id="z-komentars" placeholder="Komentārs (nav obligāts)" maxlength="300" rows="3"></textarea><br><br>
+  <button id="btn-z-sutit">Nosūtīt</button>
+  <button id="btn-z-atcelt">Atcelt</button>
+  <p id="z-zinojums"></p>
+</dialog>
+
+  <!-- Vispirms Leaflet bibliotēka, pēc tam kods -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
