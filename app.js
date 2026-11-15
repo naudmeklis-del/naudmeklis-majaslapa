@@ -73,6 +73,8 @@ async function ieladetPinus() {
 
   if (rezultats.error) {
     console.error('Kļūda:', rezultats.error.message);
+    document.getElementById('f-rezultati').textContent =
+      'Neizdevās ielādēt haltūras. ' + latviskaKluda(rezultats.error);
     return;
   }
 
@@ -123,43 +125,213 @@ ieladetPinus();
 
 // ========== 5. REĢISTRĀCIJA UN PIESLĒGŠANĀS ==========
 
-var authLogs = document.getElementById('auth-logs');
-var zinojums = document.getElementById('auth-zinojums');
+var authLogs          = document.getElementById('auth-logs');
+var loginSkats        = document.getElementById('auth-login-skats');
+var registerSkats     = document.getElementById('auth-register-skats');
+var loginZinojums     = document.getElementById('login-zinojums');
+var registerZinojums  = document.getElementById('reg-zinojums');
 
+// ---------- Kļūdu tulkošana latviski ----------
+// Pieņem Supabase kļūdu un atgriež saprotamu tekstu latviešu valodā.
+// Ja gribi pievienot jaunu tulkojumu, pievieno jaunu "if" pirms pēdējās rindas.
+function latviskaKluda(kluda) {
+  var kods   = kluda.code || '';
+  var teksts = (kluda.message || '').toLowerCase();
+
+  // --- Pieslēgšanās un reģistrācija ---
+  if (kods === 'invalid_credentials' || teksts.indexOf('invalid login credentials') !== -1) {
+    return 'Nepareizs e-pasts vai parole.';
+  }
+  if (kods === 'email_not_confirmed' || teksts.indexOf('email not confirmed') !== -1) {
+    return 'E-pasts vēl nav apstiprināts. Atver savu e-pastu un uzspied apstiprinājuma saiti.';
+  }
+  if (kods === 'user_already_exists' || kods === 'email_exists' || teksts.indexOf('already registered') !== -1) {
+    return 'Šis e-pasts jau tiek lietots. Mēģini pieslēgties.';
+  }
+  if (kods === 'weak_password' || teksts.indexOf('at least 6') !== -1 || teksts.indexOf('password should be') !== -1) {
+    return 'Parole ir pārāk vāja. Tai jābūt vismaz 6 simbolus garai.';
+  }
+  if (kods === 'email_address_invalid' || teksts.indexOf('invalid format') !== -1 ||
+      (teksts.indexOf('email') !== -1 && teksts.indexOf('invalid') !== -1)) {
+    return 'E-pasta adrese nav derīga.';
+  }
+  if (kods === 'over_request_rate_limit' || kods === 'over_email_send_rate_limit' ||
+      teksts.indexOf('rate limit') !== -1 || teksts.indexOf('for security purposes') !== -1) {
+    return 'Pārāk daudz mēģinājumu. Uzgaidi mirkli un mēģini vēlreiz.';
+  }
+  if (kods === 'signup_disabled') {
+    return 'Reģistrācija pašlaik nav pieejama.';
+  }
+
+  // --- Datubāze ---
+  if (kods === '42501' || teksts.indexOf('row-level security') !== -1) {
+    return 'Tev nav tiesību veikt šo darbību. Mēģini pieslēgties vēlreiz.';
+  }
+  if (kods === 'PGRST301' || teksts.indexOf('jwt') !== -1) {
+    return 'Pieslēgšanās sesija ir beigusies. Pieslēdzies vēlreiz.';
+  }
+  if (kods === '23505') {
+    return 'Šāds ieraksts jau pastāv.';
+  }
+  if (kods === '23502') {
+    return 'Nav aizpildīts kāds obligātais lauks.';
+  }
+  if (kods === '23514' || kods === '22001') {
+    return 'Ievadītā vērtība nav derīga vai ir pārāk gara.';
+  }
+  // Mūsu pašu ziņojumi no datubāzes (piem. ziņošanas pārbaudes) jau ir latviski
+  if (kods === 'P0001') {
+    return kluda.message;
+  }
+
+  // --- Savienojums ---
+  if (teksts.indexOf('failed to fetch') !== -1 || teksts.indexOf('network') !== -1 ||
+      kluda.name === 'AuthRetryableFetchError') {
+    return 'Nav savienojuma ar serveri. Pārbaudi internetu un mēģini vēlreiz.';
+  }
+
+  return 'Kaut kas nogāja greizi. Pamēģini vēlreiz.';
+}
+
+// ---------- Palīgfunkcijas ----------
+function epastsIrDerigs(epasts) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(epasts);
+}
+
+// Parāda ziņojumu zem formas. veids: 'kluda' (sarkans), 'ok' (zaļš), 'info' (violets)
+function paradiZinojumu(elements, teksts, veids) {
+  elements.textContent = teksts;
+  elements.className = 'auth-zinojums' + (veids === 'ok' ? ' ok' : veids === 'info' ? ' info' : '');
+}
+
+// Parāda vienu no diviem skatiem: 'login' vai 'register'
+function rutaAuthSkats(skats) {
+  loginSkats.hidden    = (skats !== 'login');
+  registerSkats.hidden = (skats !== 'register');
+  paradiZinojumu(loginZinojums, '');
+  paradiZinojumu(registerZinojums, '');
+}
+
+// Atver logu. Pēc noklusējuma rāda pieslēgšanos.
+// teksts (nav obligāts) ir paskaidrojums, piem. "Lai ziņotu, jāpieslēdzas."
+function atvertAuth(skats, teksts) {
+  skats = skats || 'login';
+  rutaAuthSkats(skats);
+  if (teksts) {
+    paradiZinojumu(skats === 'login' ? loginZinojums : registerZinojums, teksts, 'info');
+  }
+  if (!authLogs.open) authLogs.showModal();
+}
+
+// ---------- Pogas un pārslēgšanās ----------
 document.getElementById('btn-pieslegties').addEventListener('click', function () {
-  zinojums.textContent = '';
-  authLogs.showModal();
+  atvertAuth('login');
 });
 document.getElementById('btn-aizvert').addEventListener('click', function () {
   authLogs.close();
 });
 
-document.getElementById('btn-register').addEventListener('click', async function () {
-  var epasts = document.getElementById('epasts').value;
-  var parole = document.getElementById('parole').value;
-
-  var rezultats = await sb.auth.signUp({ email: epasts, password: parole });
-
-  if (rezultats.error) {
-    zinojums.textContent = 'Kļūda: ' + rezultats.error.message;
-  } else if (rezultats.data.session) {
-    authLogs.close();
-  } else {
-    zinojums.textContent = 'Reģistrācija izdevās! Pārbaudi e-pastu un uzspied apstiprinājuma saiti, tad pieslēdzies.';
-  }
+// "Nav konta? Reģistrēties" un "Jau ir konts? Pieslēgties" (e-pastu pārnes līdzi)
+document.getElementById('btn-uz-registraciju').addEventListener('click', function () {
+  var epasts = document.getElementById('login-epasts').value;
+  rutaAuthSkats('register');
+  document.getElementById('reg-epasts').value = epasts;
+});
+document.getElementById('btn-uz-pieslegsanos').addEventListener('click', function () {
+  var epasts = document.getElementById('reg-epasts').value;
+  rutaAuthSkats('login');
+  document.getElementById('login-epasts').value = epasts;
 });
 
-document.getElementById('btn-login').addEventListener('click', async function () {
-  var epasts = document.getElementById('epasts').value;
-  var parole = document.getElementById('parole').value;
+// ---------- Pieslēgšanās ----------
+document.getElementById('login-forma').addEventListener('submit', async function (e) {
+  e.preventDefault();
+  var forma  = e.target;
+  var epasts = document.getElementById('login-epasts').value.trim();
+  var parole = document.getElementById('login-parole').value;
 
-  var rezultats = await sb.auth.signInWithPassword({ email: epasts, password: parole });
+  if (epasts === '')              { paradiZinojumu(loginZinojums, 'Ievadi e-pasta adresi.'); return; }
+  if (!epastsIrDerigs(epasts))    { paradiZinojumu(loginZinojums, 'E-pasta adrese nav derīga.'); return; }
+  if (parole === '')              { paradiZinojumu(loginZinojums, 'Ievadi paroli.'); return; }
+
+  var poga = document.getElementById('btn-login');
+  poga.disabled = true;
+  poga.textContent = 'Uzgaidi...';
+  paradiZinojumu(loginZinojums, '');
+
+  var rezultats;
+  try {
+    rezultats = await sb.auth.signInWithPassword({ email: epasts, password: parole });
+  } catch (err) {
+    rezultats = { error: err };
+  }
+
+  poga.disabled = false;
+  poga.textContent = 'Pieslēgties';
 
   if (rezultats.error) {
-    zinojums.textContent = 'Kļūda: ' + rezultats.error.message;
-  } else {
-    authLogs.close();
+    paradiZinojumu(loginZinojums, latviskaKluda(rezultats.error));
+    return;
   }
+
+  forma.reset();
+  authLogs.close();
+});
+
+// ---------- Reģistrācija ----------
+document.getElementById('register-forma').addEventListener('submit', async function (e) {
+  e.preventDefault();
+  var forma   = e.target;
+  var epasts  = document.getElementById('reg-epasts').value.trim();
+  var parole  = document.getElementById('reg-parole').value;
+  var parole2 = document.getElementById('reg-parole2').value;
+
+  if (epasts === '')            { paradiZinojumu(registerZinojums, 'Ievadi e-pasta adresi.'); return; }
+  if (!epastsIrDerigs(epasts))  { paradiZinojumu(registerZinojums, 'E-pasta adrese nav derīga.'); return; }
+  if (parole.length < 6)        { paradiZinojumu(registerZinojums, 'Parolei jābūt vismaz 6 simbolus garai.'); return; }
+  if (parole !== parole2)       { paradiZinojumu(registerZinojums, 'Paroles nesakrīt.'); return; }
+
+  var poga = document.getElementById('btn-register');
+  poga.disabled = true;
+  poga.textContent = 'Uzgaidi...';
+  paradiZinojumu(registerZinojums, '');
+
+  var rezultats;
+  try {
+    rezultats = await sb.auth.signUp({ email: epasts, password: parole });
+  } catch (err) {
+    rezultats = { error: err };
+  }
+
+  poga.disabled = false;
+  poga.textContent = 'Reģistrēties';
+
+  if (rezultats.error) {
+    paradiZinojumu(registerZinojums, latviskaKluda(rezultats.error));
+    return;
+  }
+
+  // Ja e-pasts jau ir reģistrēts, Supabase kļūdu neatgriež, bet "identities" ir tukšs
+  var lietotajs = rezultats.data && rezultats.data.user;
+  if (lietotajs && lietotajs.identities && lietotajs.identities.length === 0) {
+    paradiZinojumu(registerZinojums, 'Šis e-pasts jau tiek lietots. Mēģini pieslēgties.');
+    return;
+  }
+
+  // Ja apstiprināt e-pastu nav jāprasa, lietotājs jau ir pieslēdzies
+  if (rezultats.data && rezultats.data.session) {
+    forma.reset();
+    authLogs.close();
+    return;
+  }
+
+  // Citādi jāapstiprina e-pasts: pārslēdzam uz pieslēgšanos ar paskaidrojumu
+  forma.reset();
+  rutaAuthSkats('login');
+  document.getElementById('login-epasts').value = epasts;
+  paradiZinojumu(loginZinojums,
+    'Reģistrācija izdevās! Nosūtījām apstiprinājuma saiti uz ' + epasts +
+    '. Uzspied to, tad pieslēdzies.', 'ok');
 });
 
 document.getElementById('btn-iziet').addEventListener('click', async function () {
@@ -187,8 +359,7 @@ document.getElementById('btn-pievienot').addEventListener('click', async functio
   var sesija = await sb.auth.getSession();
 
   if (!sesija.data.session) {
-    zinojums.textContent = 'Lai pievienotu haltūru, jāpieslēdzas.';
-    authLogs.showModal();
+    atvertAuth('login', 'Lai pievienotu haltūru, jāpieslēdzas.');
     return;
   }
 
@@ -238,7 +409,7 @@ document.getElementById('btn-saglabat').addEventListener('click', async function
   });
 
   if (rezultats.error) {
-    hZinojums.textContent = 'Kļūda: ' + rezultats.error.message;
+    hZinojums.textContent = latviskaKluda(rezultats.error);
     return;
   }
 
@@ -298,7 +469,7 @@ async function ieladetManus() {
     .order('created_at', { ascending: false });
 
   if (rezultats.error) {
-    maniSaraksts.textContent = 'Kļūda: ' + rezultats.error.message;
+    maniSaraksts.textContent = latviskaKluda(rezultats.error);
     return;
   }
 
@@ -369,7 +540,7 @@ function izveidotRindu(h) {
     }).eq('id', h.id);
 
     if (r.error) {
-      alert('Kļūda: ' + r.error.message);
+      alert(latviskaKluda(r.error));
     } else {
       alert('Saglabāts!');
       ieladetPinus();
@@ -384,7 +555,7 @@ function izveidotRindu(h) {
     var r = await sb.from('gigs').delete().eq('id', h.id);
 
     if (r.error) {
-      alert('Kļūda: ' + r.error.message);
+      alert(latviskaKluda(r.error));
     } else {
       ieladetManus();
       ieladetPinus();
@@ -523,8 +694,7 @@ async function atvertZinosanu(id) {
   var sesija = await sb.auth.getSession();
 
   if (!sesija.data.session) {
-    zinojums.textContent = 'Lai ziņotu par sludinājumu, jāpieslēdzas.';
-    authLogs.showModal();
+    atvertAuth('login', 'Lai ziņotu par sludinājumu, jāpieslēdzas.');
     return;
   }
 
@@ -553,7 +723,7 @@ document.getElementById('btn-z-sutit').addEventListener('click', async function 
     if (rezultats.error.code === '23505') {
       zZinojums.textContent = 'Tu jau esi ziņojis par šo sludinājumu.';
     } else {
-      zZinojums.textContent = 'Kļūda: ' + rezultats.error.message;
+      zZinojums.textContent = latviskaKluda(rezultats.error);
     }
     return;
   }

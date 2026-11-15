@@ -28,7 +28,7 @@
       <button id="btn-filtri" class="pievienot-btn filtri-btn">Filtri</button>
       <button id="btn-mani" style="display: none;" class="manisludinajumi-btn">Mani sludinājumi</button>
       <button id="btn-pievienot" class="pievienot-btn">Pievienot haltūru</button>
-      <button id="btn-pieslegties" class="pieslegties-btn">Pieslēgties</button>
+      <button id="btn-pieslegties" class="pieslegties-btn">Pieslēgties / Reģistrēties</button>
       <button id="btn-iziet" style="display: none;" class="iziet-btn">Iziet</button>
     </div>
   </div>
@@ -59,11 +59,6 @@
   <div id="karte"></div>
 
 </div>
-  <!-- Reklma -->
-<div class="partneri">
-  <small>Reklāma</small>
-  
-</div>
 
 <footer class="footer">
   <a href="par-mums.html">Par mums</a>
@@ -72,13 +67,56 @@
 </footer>
 
   <dialog id="auth-logs">
-  <h3 class="authdialog-title">Pieslēgšanās | Reģistrācija</h3>
-  <input type="email" id="epasts" placeholder="E-pasts"><br><br>
-  <input type="password" id="parole" placeholder="Parole (vismaz 6 simboli)"><br><br>
-  <button class="btn-login" id="btn-login">Pieslēgties</button>
-  <button class="btn-register" id="btn-register">Reģistrēties</button>
-  <button class="btn-aizvert" id="btn-aizvert">Aizvērt</button>
-  <p id="auth-zinojums"></p>
+
+  <!-- 1. skats: PIESLĒGŠANĀS (atveras pirmais) -->
+  <section id="auth-login-skats">
+    <h3 class="authdialog-title">Pieslēgties</h3>
+    <form id="login-forma" novalidate>
+      <div class="auth-lauks">
+        <label for="login-epasts">E-pasts</label>
+        <input type="email" id="login-epasts" autocomplete="email" placeholder="piemers@epasts.lv">
+      </div>
+      <div class="auth-lauks">
+        <label for="login-parole">Parole</label>
+        <input type="password" id="login-parole" autocomplete="current-password" placeholder="Tava parole">
+      </div>
+      <p class="auth-zinojums" id="login-zinojums" role="alert"></p>
+      <button type="submit" class="btn-login auth-submit" id="btn-login">Pieslēgties</button>
+    </form>
+    <p class="auth-parslegt">
+      Nav konta?
+      <button type="button" class="auth-saite" id="btn-uz-registraciju">Reģistrēties</button>
+    </p>
+  </section>
+
+  <!-- 2. skats: REĢISTRĀCIJA (parādās, kad uzspiež "Reģistrēties") -->
+  <section id="auth-register-skats" hidden>
+    <h3 class="authdialog-title">Izveidot kontu</h3>
+    <form id="register-forma" novalidate>
+      <div class="auth-lauks">
+        <label for="reg-epasts">E-pasts</label>
+        <input type="email" id="reg-epasts" autocomplete="email" placeholder="piemers@epasts.lv">
+      </div>
+      <div class="auth-lauks">
+        <label for="reg-parole">Parole</label>
+        <input type="password" id="reg-parole" autocomplete="new-password" placeholder="Vismaz 6 simboli">
+      </div>
+      <div class="auth-lauks">
+        <label for="reg-parole2">Atkārto paroli</label>
+        <input type="password" id="reg-parole2" autocomplete="new-password" placeholder="Ieraksti paroli vēlreiz">
+      </div>
+      <p class="auth-zinojums" id="reg-zinojums" role="alert"></p>
+      <button type="submit" class="btn-register auth-submit" id="btn-register">Reģistrēties</button>
+    </form>
+    <p class="auth-parslegt">
+      Jau ir konts?
+      <button type="button" class="auth-saite" id="btn-uz-pieslegsanos">Pieslēgties</button>
+    </p>
+  </section>
+
+  <div class="auth-aizvert-rinda">
+    <button type="button" class="btn-aizvert" id="btn-aizvert">Aizvērt</button>
+  </div>
 </dialog>
 
 <dialog id="haltura-logs">

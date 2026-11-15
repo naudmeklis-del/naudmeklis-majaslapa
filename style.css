@@ -6,18 +6,6 @@
   font-style: normal;
 }
 
-@media (max-width: 600px) {
-  .logo { height: 36px; }
-
-  .pieslegties-btn,
-  .pievienot-btn,
-  .manisludinajumi-btn,
-  .iziet-btn {
-    padding: 8px 10px;
-    font-size: 14px;
-  }
-}
-
 :root {
   color-scheme: light;
 }
@@ -336,9 +324,9 @@ dialog textarea {
 }
 
 .authdialog-title {
-      /* purple background */
-  color: #000000;             /* text color */       
-  font-size: 15px;     
+  margin: 0 0 16px;
+  color: #3C1955;
+  font-size: 22px;
   font-family: "DM Sans", sans-serif;
   font-weight: bold;
 }
@@ -423,4 +411,115 @@ button, input, select, textarea {
   display: inline-block;     /* lai svītriņa netiktu pasvītrota */
   margin-right: 12px;
   color: #cdb9e6;
+}
+
+
+/* ===== Pieslēgšanās / reģistrācijas logs ===== */
+.auth-lauks {
+  margin-bottom: 12px;
+}
+.auth-lauks label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #3C1955;
+}
+
+/* Ziņojums zem formas: sarkans = kļūda, zaļš = izdevās, violets = paskaidrojums */
+.auth-zinojums {
+  min-height: 1.3em;
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: #791414;
+}
+.auth-zinojums.ok   { color: #15911f; }
+.auth-zinojums.info { color: #3C1955; }
+
+.auth-submit {
+  width: 100%;
+}
+
+.auth-parslegt {
+  margin: 16px 0 0;
+  text-align: center;
+  font-size: 15px;
+}
+
+/* Saite-poga ("Reģistrēties" / "Pieslēgties" zem formas) */
+.auth-saite {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  color: #5b2a9e;
+  font-size: 15px;
+  text-decoration: underline;
+}
+.auth-saite:hover {
+  background: none;
+  color: #3C1955;
+}
+
+.auth-aizvert-rinda {
+  margin-top: 16px;
+  text-align: center;
+}
+
+dialog button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+
+/* ===== TELEFONS: mazākas pogas =====
+   Šim blokam jābūt faila BEIGĀS, lai tas pārraksta iepriekšējos izmērus.
+   Ja pogas vēl joprojām šķiet par lielām, samazini skaitļus "padding" un "font-size". */
+@media (max-width: 600px) {
+
+  /* Augšējā josla */
+  .josla {
+    min-height: 56px;
+    padding: 6px 8px;
+    gap: 6px;
+  }
+  .logo {
+    height: 32px;
+  }
+  .josla > div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+  .pieslegties-btn,
+  .pievienot-btn,
+  .manisludinajumi-btn,
+  .iziet-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    border-radius: 8px;
+  }
+
+  /* Pogas logos (pieslēgšanās, haltūras pievienošana u.c.) */
+  dialog button,
+  .btn-login,
+  .btn-register,
+  .btn-aizvert {
+    padding: 8px 12px;
+    font-size: 13px;
+    border-radius: 8px;
+  }
+}
+
+
+/* ===== TELEFONS: mazāka apakšējā josla (Par mums | Noteikumi | Privātuma politika) ===== */
+@media (max-width: 600px) {
+  .footer {
+    padding: 6px 8px;
+    gap: 8px;
+    font-size: 12px;
+  }
+  .footer a + a::before {
+    margin-right: 8px;   /* atstarpe starp svītriņu | un nākamo saiti */
+  }
 }
