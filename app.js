@@ -344,6 +344,7 @@ sb.auth.onAuthStateChange(function (notikums, sesija) {
   document.getElementById('btn-pieslegties').style.display = pieslegts ? 'none' : 'inline-block';
   document.getElementById('btn-iziet').style.display = pieslegts ? 'inline-block' : 'none';
   document.getElementById('btn-mani').style.display = pieslegts ? 'inline-block' : 'none';
+  document.getElementById('btn-pievienot').style.display = pieslegts ? 'inline-block' : 'none';
 });
 
 
@@ -423,7 +424,7 @@ document.getElementById('btn-saglabat').addEventListener('click', async function
 });
 
 
-// ========== 7. MANI SLUDINĀJUMI ==========
+// ========== 7. MANS PROFILS (profils + mani sludinājumi) ==========
 
 var maniLogs = document.getElementById('mani-logs');
 var maniSaraksts = document.getElementById('mani-saraksts');
@@ -462,6 +463,12 @@ async function ieladetManus() {
 
   var sesija = await sb.auth.getSession();
   if (!sesija.data.session) return;
+
+  // Profila augšdaļa: e-pasts un avatārs ar e-pasta pirmo burtu
+  var epasts = sesija.data.session.user.email || '';
+  document.getElementById('profils-epasts').textContent = epasts;
+  document.getElementById('profils-avatars').textContent =
+    epasts ? epasts.charAt(0).toUpperCase() : '?';
 
   var rezultats = await sb.from('gigs')
     .select('*')

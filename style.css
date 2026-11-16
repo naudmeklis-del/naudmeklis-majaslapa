@@ -523,3 +523,52 @@ dialog button:disabled {
     margin-right: 8px;   /* atstarpe starp svītriņu | un nākamo saiti */
   }
 }
+
+
+/* ===== Profila logs ("Mans profils") ===== */
+#mani-logs {
+  max-height: 85vh;
+  overflow-y: auto;          /* ja sludinājumu daudz, logs ritinās */
+}
+
+.profils-galva {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  margin-bottom: 16px;
+  background: #F3EAFB;
+  border-radius: 12px;
+}
+
+.profils-avatars {
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #3C1955;
+  color: #FAF5FA;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.profils-epasts {
+  font-weight: bold;
+  color: #3C1955;
+  word-break: break-all;     /* garš e-pasts netiek ārā no loga */
+}
+
+.profils-vertejums {
+  margin-top: 2px;
+  font-size: 14px;
+  color: #888;
+}
+
+.profils-apaksvirsraksts {
+  margin: 0 0 4px;
+  font-size: 16px;
+  color: #3C1955;
+}

@@ -17,8 +17,8 @@
 
   <!-- mans izskats -->
   <link rel="stylesheet" href="style.css">
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7750393781152096"
-     crossorigin="anonymous"></script>
+  <!--<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7750393781152096"
+     crossorigin="anonymous"></script> -->
 </head>
 
 <body>
@@ -28,8 +28,8 @@
     <img src="naudmeklishorizotalilogo.png" class="logo" alt="Naudmeklis">
     <div>
       <button id="btn-filtri" class="pievienot-btn filtri-btn">Filtri</button>
-      <button id="btn-mani" style="display: none;" class="manisludinajumi-btn">Mani sludinājumi</button>
-      <button id="btn-pievienot" class="pievienot-btn">Pievienot haltūru</button>
+      <button id="btn-mani" style="display: none;" class="manisludinajumi-btn">Mans profils</button>
+      <button id="btn-pievienot" style="display: none;" class="pievienot-btn">Pievienot haltūru</button>
       <button id="btn-pieslegties" class="pieslegties-btn">Pieslēgties / Reģistrēties</button>
       <button id="btn-iziet" style="display: none;" class="iziet-btn">Iziet</button>
     </div>
@@ -137,7 +137,17 @@
 </dialog>
 
 <dialog id="mani-logs">
-  <h3>Mani sludinājumi</h3>
+  <h3>Mans profils</h3>
+
+  <div class="profils-galva">
+    <div class="profils-avatars" id="profils-avatars">?</div>
+    <div>
+      <div class="profils-epasts" id="profils-epasts"></div>
+      <div class="profils-vertejums" id="profils-vertejums">☆☆☆☆☆ Vērtējumi drīzumā</div>
+    </div>
+  </div>
+
+  <h4 class="profils-apaksvirsraksts">Mani sludinājumi</h4>
   <div id="mani-saraksts"></div>
   <br>
   <button id="btn-mani-aizvert">Aizvērt</button>
