@@ -572,3 +572,35 @@ dialog button:disabled {
   font-size: 16px;
   color: #3C1955;
 }
+
+
+/* ===== Savi sludinājumi kartē: tāds pats pin'š, bet ar dzeltenu apmali ===== */
+.pins.pins-mana {
+  border-color: #FFC400;
+  box-shadow: 0 0 0 1px rgba(60, 25, 85, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* ===== Paziņojums ekrāna vidū (piem. "Sludinājums veiksmīgi pievienots") ===== */
+.pazinojums-centra {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  z-index: 5000;                 /* virs kartes un tās pogām */
+  max-width: 80vw;
+  padding: 18px 26px;
+  background: #3C1955;
+  color: #FAF5FA;
+  border-radius: 14px;
+  font-size: 17px;
+  font-weight: bold;
+  text-align: center;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  pointer-events: none;          /* neaizsedz klikšķus, kad ir paslēpts */
+  transition: opacity 0.25s, transform 0.25s;
+}
+.pazinojums-centra.redzams {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}

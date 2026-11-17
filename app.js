@@ -24,6 +24,18 @@ var pinaIkona = L.divIcon({
   popupAnchor: [0, -45]
 });
 
+// Tāds pats pin'š, bet ar dzeltenu apmali: tā tiek rādīti PAŠA lietotāja sludinājumi
+var pinaIkonaMana = L.divIcon({
+  className: '',
+  html: '<div class="pins pins-mana"><span>€</span></div>',
+  iconSize: [36, 36],
+  iconAnchor: [18, 43],
+  popupAnchor: [0, -45]
+});
+
+// Pieslēgtā lietotāja id (null, ja nav pieslēdzies). To atjauno sadaļā 5.
+var manaLietotajaId = null;
+
 // Pārvērš tekstu drošā formā (lai neviens nevar ievietot savu kodu)
 function drosiTeksts(teksts) {
   var d = document.createElement('div');
@@ -34,7 +46,7 @@ function drosiTeksts(teksts) {
 // Atsevišķs slānis pin'iem, lai tos var notīrīt un ielādēt no jauna
 var pinuSlanis = L.layerGroup().addTo(karte);
 
-function pievienotPinu(platums, garums, nosaukums, cena, apraksts, id) {
+function pievienotPinu(platums, garums, nosaukums, cena, apraksts, id, lietotajaId) {
   var teksts =
     '<div class="popup-nosaukums">' + drosiTeksts(nosaukums) + '</div>' +
     '<div class="popup-cena">' + drosiTeksts(cena) + '€</div>';
@@ -57,7 +69,13 @@ function pievienotPinu(platums, garums, nosaukums, cena, apraksts, id) {
   });
   saturs.appendChild(btnZinot);
 
-  L.marker([platums, garums], { icon: pinaIkona })
+  // Vai šis sludinājums pieder pieslēgtajam lietotājam?
+  var irMans = manaLietotajaId !== null && lietotajaId === manaLietotajaId;
+
+  L.marker([platums, garums], {
+    icon: irMans ? pinaIkonaMana : pinaIkona,
+    zIndexOffset: irMans ? 1000 : 0     // savi pin'i vienmēr virs pārējiem
+  })
     .addTo(pinuSlanis)
     .bindPopup(saturs);
 }
@@ -113,7 +131,7 @@ function pielietotFiltrus() {
 
   pinuSlanis.clearLayers();
   atlasitas.forEach(function (h) {
-    pievienotPinu(h.lat, h.lon, h.title, h.price, h.description, h.id);
+    pievienotPinu(h.lat, h.lon, h.title, h.price, h.description, h.id, h.user_id);
   });
 
   document.getElementById('f-rezultati').textContent =
@@ -341,6 +359,8 @@ document.getElementById('btn-iziet').addEventListener('click', async function ()
 // Seko, vai lietotājs ir pieslēdzies, un parāda pareizās pogas
 sb.auth.onAuthStateChange(function (notikums, sesija) {
   var pieslegts = sesija !== null;
+  manaLietotajaId = pieslegts ? sesija.user.id : null;
+  if (visasHalturas.length > 0) pielietotFiltrus();   // pārzīmē pin'us, lai savi sludinājumi iegūtu dzelteno apmali
   document.getElementById('btn-pieslegties').style.display = pieslegts ? 'none' : 'inline-block';
   document.getElementById('btn-iziet').style.display = pieslegts ? 'inline-block' : 'none';
   document.getElementById('btn-mani').style.display = pieslegts ? 'inline-block' : 'none';
@@ -349,6 +369,29 @@ sb.auth.onAuthStateChange(function (notikums, sesija) {
 
 
 // ========== 6. HALTŪRAS PIEVIENOŠANA ==========
+
+// Cik aktīvus sludinājumus vienlaikus drīkst turēt viens lietotājs.
+// (Tas pats skaitlis jānorāda arī Supabase SQL trigerī!)
+var MAKS_SLUDINAJUMI = 2;
+var LIMITA_TEKSTS = 'Vari pievienot ne vairāk kā ' + MAKS_SLUDINAJUMI +
+  ' sludinājumus vienlaikus. Izdzēs kādu no esošajiem sadaļā "Mans profils".';
+
+// Īss paziņojums ekrāna vidū, kas pēc brīža pats pazūd
+function paradiPazinojumu(teksts, ms) {
+  var el = document.getElementById('pazinojums-centra');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'pazinojums-centra';
+    el.className = 'pazinojums-centra';
+    document.body.appendChild(el);
+  }
+  el.textContent = teksts;
+  el.classList.add('redzams');
+  clearTimeout(el._taimeris);
+  el._taimeris = setTimeout(function () {
+    el.classList.remove('redzams');
+  }, ms || 2500);   // ms nav obligāts, pēc noklusējuma 2,5 sekundes
+}
 
 var halturaLogs = document.getElementById('haltura-logs');
 var hZinojums = document.getElementById('h-zinojums');
@@ -361,6 +404,16 @@ document.getElementById('btn-pievienot').addEventListener('click', async functio
 
   if (!sesija.data.session) {
     atvertAuth('login', 'Lai pievienotu haltūru, jāpieslēdzas.');
+    return;
+  }
+
+  // Pārbauda, vai lietotājam jau nav pieļaujamais sludinājumu skaits
+  var skaits = await sb.from('gigs')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', sesija.data.session.user.id);
+
+  if (!skaits.error && skaits.count >= MAKS_SLUDINAJUMI) {
+    paradiPazinojumu(LIMITA_TEKSTS, 4000);
     return;
   }
 
@@ -410,6 +463,13 @@ document.getElementById('btn-saglabat').addEventListener('click', async function
   });
 
   if (rezultats.error) {
+    // Datubāzes limits (P0001): aizveram logu un parādām paziņojumu ekrāna vidū
+    if (rezultats.error.code === 'P0001') {
+      if (pagaiduPins) karte.removeLayer(pagaiduPins);
+      halturaLogs.close();
+      paradiPazinojumu(LIMITA_TEKSTS, 4000);
+      return;
+    }
     hZinojums.textContent = latviskaKluda(rezultats.error);
     return;
   }
@@ -421,6 +481,7 @@ document.getElementById('btn-saglabat').addEventListener('click', async function
   document.getElementById('h-cena').value = '';
   document.getElementById('h-apraksts').value = '';
   halturaLogs.close();
+  paradiPazinojumu('✓ Sludinājums veiksmīgi pievienots!');
 });
 
 
