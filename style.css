@@ -348,6 +348,22 @@ dialog textarea {
 
 .chip-teksts { flex: 1; }
 
+/* Sludinājumu skaits kategorijas pogas labajā pusē */
+.chip-skaits {
+  flex-shrink: 0;
+  min-width: 24px;
+  box-sizing: border-box;
+  padding: 2px 8px;
+  background: #E6D9F5;
+  color: #3C1955;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 1.4;
+}
+.chip.aktivs .chip-skaits { background: #FAF5FA; color: #3C1955; }
+
 /* Ķeksītis, kas redzams tikai aktīvai kategorijai */
 .chip-ok {
   display: none;
@@ -641,7 +657,7 @@ dialog button:disabled {
     gap: 6px;
   }
   .logo {
-    height: 40px;
+    height: 32px;
   }
   .josla > div {
     display: flex;

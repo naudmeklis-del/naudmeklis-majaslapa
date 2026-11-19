@@ -226,6 +226,7 @@ async function ieladetPinus() {
   }
 
   visasHalturas = rezultats.data;   // iegaumējam visu sarakstu
+  atjaunotKategorijuSkaitu();       // uzliek skaitļus uz kategoriju pogām
   pielietotFiltrus();               // un parādām to, kas atbilst filtriem
 }
 
@@ -266,6 +267,17 @@ function pielietotFiltrus() {
 
   document.getElementById('f-rezultati').textContent =
     'Atrastas haltūras: ' + atlasitas.length;
+}
+
+// Uzliek katras kategorijas pogai sludinājumu skaitu (skaita visus ielādētos sludinājumus)
+function atjaunotKategorijuSkaitu() {
+  var skaiti = {};
+  visasHalturas.forEach(function (h) {
+    skaiti[h.category] = (skaiti[h.category] || 0) + 1;
+  });
+  document.querySelectorAll('.chip-skaits').forEach(function (el) {
+    el.textContent = skaiti[el.dataset.kategorija] || 0;
+  });
 }
 
 ieladetPinus();
@@ -828,6 +840,13 @@ kategorijas.forEach(function (k) {
   teksts.textContent = k;
   chip.appendChild(teksts);
 
+  // Sludinājumu skaits šajā kategorijā (labajā pusē)
+  var skaits = document.createElement('span');
+  skaits.className = 'chip-skaits';
+  skaits.dataset.kategorija = k;
+  skaits.textContent = '0';
+  chip.appendChild(skaits);
+
   // Ķeksītis (redzams tikai aktīvai kategorijai)
   var ok = document.createElement('span');
   ok.className = 'chip-ok';
@@ -848,6 +867,8 @@ kategorijas.forEach(function (k) {
 
   chipsVieta.appendChild(chip);
 });
+
+atjaunotKategorijuSkaitu();   // ja sludinājumi jau ielādēti, uzreiz uzliek skaitļus
 
 // Katru reizi, kad lietotājs kaut ko ieraksta vai atzīmē, filtrus pielieto no jauna
 ['f-meklet', 'f-min', 'f-max'].forEach(function (id) {
