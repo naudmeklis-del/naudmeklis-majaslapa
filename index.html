@@ -25,7 +25,7 @@
 
   <!-- Augšējā josla -->
   <div class="josla">
-    <img src="naudmeklishorizotalilogo.png" class="logo" alt="Naudmeklis">
+    <img src="naudmeklislogoarsaukli.png" class="logo" alt="Naudmeklis">
     <div>
       <button id="btn-filtri" class="pievienot-btn filtri-btn">Filtri</button>
       <button id="btn-mani" style="display: none;" class="manisludinajumi-btn">Mans profils</button>
@@ -39,26 +39,62 @@
   <div class="saturs">
 
   <aside class="filtri-panel" id="filtri-panel">
-    <h3>Filtri <button id="btn-notirit" class="saite-btn">Notīrīt filtrus</button></h3>
 
-    <label for="f-meklet">Meklēt</label>
-    <input type="text" id="f-meklet" placeholder="Meklēt (piem. dizains)">
-
-    <label>Kategorijas</label>
-    <div id="f-kategorijas" class="chips"></div>
-
-    <label>Cena (€)</label>
-    <div class="cena-rinda">
-      <input type="number" id="f-min" placeholder="Min (€)">
-      <input type="number" id="f-max" placeholder="Max (€)">
+    <!-- Virsraksts un "Notīrīt filtrus" -->
+    <div class="filtri-galva">
+      <h3 class="filtri-virsraksts">
+        <svg class="ikona" viewBox="0 0 24 24" aria-hidden="true"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        Filtri
+      </h3>
+      <button id="btn-notirit" class="saite-btn" type="button">
+        Notīrīt filtrus
+        <svg class="ikona" viewBox="0 0 24 24" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      </button>
     </div>
 
-    <label><input type="checkbox" id="f-apmaksatas"> Rādīt tikai apmaksātās</label>
+    <!-- Meklēšana -->
+    <div class="filtri-meklet">
+      <svg class="ikona" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="f-meklet" placeholder="Meklēt" aria-label="Meklēt">
+    </div>
 
-    <p id="f-rezultati"></p>
+    <!-- Kategorijas (pogas tiek izveidotas no app.js) -->
+    <div class="filtri-sadala">
+      <div class="filtri-nosaukums">
+        <svg class="ikona" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Kategorijas
+      </div>
+      <div id="f-kategorijas" class="chips"></div>
+    </div>
+
+    <!-- Cena -->
+    <div class="filtri-sadala">
+      <div class="filtri-nosaukums">
+        <span class="euro-ikona" aria-hidden="true">€</span>
+        Cena (€)
+      </div>
+      <div class="cena-rinda">
+        <input type="number" id="f-min" placeholder="Min (€)" aria-label="Minimālā cena">
+        <span class="cena-svitra">–</span>
+        <input type="number" id="f-max" placeholder="Max (€)" aria-label="Maksimālā cena">
+      </div>
+    </div>
+
+    <label><input class="ampaksats-check" type="checkbox" id="f-apmaksatas"> Rādīt tikai apmaksātās</label>
+
   </aside>
 
-  <div id="karte"></div>
+  <div class="karte-wrap">
+    <div id="karte"></div>
+
+    <!-- Kartīte kartes apakšējā kreisajā stūrī: "Atrastas haltūras: N" -->
+    <div class="rezultatu-karte">
+      <span class="rezultatu-ikona">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+      </span>
+      <span id="f-rezultati"></span>
+    </div>
+  </div>
 
 </div>
 
@@ -147,8 +183,19 @@
     </div>
   </div>
 
-  <h4 class="profils-apaksvirsraksts">Mani sludinājumi</h4>
-  <div id="mani-saraksts"></div>
+  <!-- Cilnes: Mani sludinājumi | Favorīti -->
+  <div class="profils-tabi">
+    <button type="button" class="profils-tab aktivs" id="tab-sludinajumi">Mani sludinājumi</button>
+    <button type="button" class="profils-tab" id="tab-favoriti">★ Favorīti</button>
+  </div>
+
+  <div id="panelis-sludinajumi">
+    <div id="mani-saraksts"></div>
+  </div>
+
+  <div id="panelis-favoriti" hidden>
+    <div id="favoritu-saraksts"></div>
+  </div>
   <br>
   <button id="btn-mani-aizvert">Aizvērt</button>
 </dialog>

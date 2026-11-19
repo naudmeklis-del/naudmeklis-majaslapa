@@ -46,7 +46,7 @@ body {
 .pins {
   width: 36px;
   height: 36px;
-  background: #5b2a9e;
+  background: #3C1955;
   border: 3px solid white;
   border-radius: 50% 50% 50% 0;
   transform: rotate(-45deg);
@@ -71,16 +71,17 @@ body {
 .popup-nosaukums {
   font-size: 16px;
   font-weight: bold;
-  color: #3b1a6b;
+  color: #3C1955;
 }
 .popup-cena {
-  color: #5b2a9e;
+  color: #3C1955;
   font-weight: bold;
 }
 .pieslegties-btn {
-  background: #15911f;      /* purple background */
-  color: #FAF5FA;             /* text color */
-  border: none;             /* removes the default border */
+  background: #FAF5FA;      /* purple background */
+  color: #3C1955;             /* text color */
+  border-style: solid;
+  border-color: #3C1955;             /* removes the default border */
   border-radius: 10px;      /* rounded corners */
   padding: 10px 16px;       /* space inside: top/bottom, left/right */
   font-size: 15px;
@@ -91,7 +92,8 @@ body {
 
 /* When the mouse is over the button */
 .pieslegties-btn:hover {
-  background: #0a440f;      /* darker purple */
+  background: #3C1955;
+  color: white      /* darker purple */
 }
 .pievienot-btn {
   background: #3C1955;      /* purple background */
@@ -126,20 +128,22 @@ body {
   background: #281138;      /* darker purple */
 }
 .iziet-btn {
-  background: #791414;      /* purple background */
-  color: #FAF5FA;             /* text color */
-  border: none;             /* removes the default border */
+ background: #FAF5FA;      /* purple background */
+  color: #3C1955;             /* text color */
+  border-style: solid;
+  border-color: #3C1955;             /* removes the default border */
   border-radius: 10px;      /* rounded corners */
-  padding: 10px 16px;       /* space inside: top/bottom, left/right */
+  padding: 9px 16px;       /* space inside: top/bottom, left/right */
   font-size: 15px;
-  font-weight: bold;
-  cursor: pointer;          /* hand cursor on hover */
+  cursor: pointer;         /* hand cursor on hover */
   font-family: "DM Sans", sans-serif;
+  font-weight: bold;
 }
 
 /* When the mouse is over the button */
 .iziet-btn:hover {
-  background: #3a1111;      /* darker purple */
+  background: #3C1955;
+  color: white      /* darker purple */
 }
 
 .popup-apraksts {
@@ -198,57 +202,211 @@ dialog textarea {
 }
 #karte { flex: 1; min-width: 0; }
 
+/* ===== FILTRU PANELIS ===== */
 .filtri-panel {
-  width: 280px;
+  width: 300px;
   flex-shrink: 0;
   box-sizing: border-box;
-  padding: 16px;
-  background: #F3EAFB;
+  padding: 20px 18px;
+  background: #fff;
+  border-right: 1px solid #e6dcee;
   overflow-y: auto;
+  color: #3C1955;
 }
-.filtri-panel h3 {
+
+/* Vienādas līniju ikonas panelī (violetas, krāsu ņem no teksta) */
+.filtri-panel .ikona {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Virsraksts "Filtri" un saite "Notīrīt filtrus" */
+.filtri-galva {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.filtri-virsraksts {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin: 0;
+  font-size: 24px;
   color: #3C1955;
 }
-.filtri-panel label {
-  display: block;
-  margin: 14px 0 6px;
+.filtri-virsraksts .ikona { width: 24px; height: 24px; }
+
+.saite-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 0;
+  color: #5b2a9e;
+  font-size: 14px;
   font-weight: bold;
-  color: #3C1955;
+  cursor: pointer;
 }
+.saite-btn:hover { color: #3C1955; }
+.saite-btn .ikona { width: 16px; height: 16px; }
+
+/* Ievades lauki */
 .filtri-panel input[type="text"],
 .filtri-panel input[type="number"] {
   width: 100%;
   box-sizing: border-box;
-  padding: 8px;
-  border: 1px solid #cdb9e6;
-  border-radius: 8px;
+  padding: 12px 14px;
+  border: 1px solid #d9cde8;
+  border-radius: 12px;
+  background: #fff;
+  color: #3C1955;
+  font-size: 16px;
 }
-.cena-rinda { display: flex; gap: 8px; }
+.filtri-panel input::placeholder { color: #9a8bb0; }
+.filtri-panel input[type="text"]:focus,
+.filtri-panel input[type="number"]:focus {
+  outline: none;
+  border-color: #5b2a9e;
+  box-shadow: 0 0 0 3px #E6D9F5;
+}
 
-/* Kategoriju "pogas" */
-.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+/* Meklēšana ar lupu */
+.filtri-meklet {
+  position: relative;
+  margin-bottom: 22px;
+}
+.filtri-meklet .ikona {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.filtri-meklet input[type="text"] { padding-left: 44px; }
+
+/* Sadaļas (Kategorijas, Cena) */
+.filtri-sadala { margin-bottom: 22px; }
+.filtri-nosaukums {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-size: 17px;
+  font-weight: bold;
+  color: #3C1955;
+}
+.euro-ikona {
+  width: 20px;
+  text-align: center;
+  font-size: 18px;
+}
+
+/* Kategoriju saraksts */
+.chips {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 .chip {
-  background: #E6D9F5;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 14px;
+  background: #F3EAFB;
   color: #3C1955;
   border: none;
-  border-radius: 8px;
-  padding: 6px 10px;
-  font-size: 14px;
+  border-radius: 10px;
+  font-size: 15px;
+  text-align: left;
   cursor: pointer;
+  transition: background 0.15s, color 0.15s;
 }
-.chip.aktivs { background: #3C1955; color: #FAF5FA; }
+.chip:hover { background: #E6D9F5; }
+.chip.aktivs { background: #3C1955; color: #FAF5FA; font-weight: bold; }
+.chip.aktivs:hover { background: #281138; }
 
-.saite-btn {
-  background: none;
-  border: none;
-  color: #5b2a9e;
-  text-decoration: underline;
-  font-size: 13px;
-  cursor: pointer;
+/* Vieta ikonai pie katras kategorijas (ikonu pievieno app.js sarakstā "kategorijuIkonas") */
+.chip-ikona {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+/* Aktīvai kategorijai ikona kļūst balta (der vienkrāsainām ikonām) */
+.chip.aktivs .chip-ikona { filter: brightness(0) invert(1); }
+
+.chip-teksts { flex: 1; }
+
+/* Ķeksītis, kas redzams tikai aktīvai kategorijai */
+.chip-ok {
+  display: none;
+  flex-shrink: 0;
+}
+.chip.aktivs .chip-ok { display: flex; }
+
+/* Cenas diapazons */
+.cena-rinda {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.cena-svitra { color: #9a8bb0; }
+
+/* Slēdzis "Rādīt tikai apmaksātās" un rezultātu skaits */
+.filtri-panel label:has(.ampaksats-check) {
+  font-weight: 400;
+  margin: 4px 0 0;
+}
+/* Karte ar kartīti "Atrastas haltūras" stūrī */
+.karte-wrap {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  display: flex;
+}
+
+.rezultatu-karte {
+  position: absolute;
+  left: 16px;
+  bottom: 28px;
+  z-index: 1000;                 /* virs kartes */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: calc(100% - 32px);
+  box-sizing: border-box;
+  padding: 10px 18px 10px 10px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(60, 25, 85, 0.2);
+  color: #3C1955;
+  font-size: 16px;
+  font-weight: bold;
+  pointer-events: none;          /* neaizsedz klikšķus uz kartes */
+}
+.rezultatu-karte:has(#f-rezultati:empty) { display: none; }   /* paslēpta, kamēr nav teksta */
+
+.rezultatu-ikona {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #F3EAFB;
+  border-radius: 10px;
+  color: #3C1955;
 }
 
 /* Poga "Filtri" datorā nav vajadzīga */
@@ -483,7 +641,7 @@ dialog button:disabled {
     gap: 6px;
   }
   .logo {
-    height: 32px;
+    height: 40px;
   }
   .josla > div {
     display: flex;
@@ -604,3 +762,220 @@ dialog button:disabled {
   opacity: 1;
   transform: translate(-50%, -50%) scale(1);
 }
+
+label:has(.ampaksats-check) {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    font-family: "DM Sans", sans-serif;
+    color: #211638;
+    user-select: none;
+}
+
+/* Paslēpj standarta checkbox */
+.ampaksats-check {
+    appearance: none;
+    -webkit-appearance: none;
+
+    width: 48px;
+    height: 26px;
+    margin: 0;
+
+    background: #DCD6E8;
+    border-radius: 30px;
+    position: relative;
+    cursor: pointer;
+
+    transition: background 0.25s ease;
+    flex-shrink: 0;
+}
+
+/* Baltais aplītis */
+.ampaksats-check::before {
+    content: "";
+    position: absolute;
+
+    width: 20px;
+    height: 20px;
+    left: 3px;
+    top: 3px;
+
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+
+    transition: transform 0.25s ease;
+}
+
+/* Ieslēgts stāvoklis */
+.ampaksats-check:checked {
+    background: #3C1955;
+}
+
+/* Aplītis pārvietojas pa labi */
+.ampaksats-check:checked::before {
+    transform: translateX(22px);
+}
+
+/* Tastatūras fokuss */
+.ampaksats-check:focus-visible {
+    outline: 3px solid #cbb8e8;
+    outline-offset: 3px;
+}
+
+
+/* ===== SLUDINĀJUMA KARTĪTE (logs, kas atveras uz pin'a) ===== */
+.sludinajuma-popup .leaflet-popup-content-wrapper {
+  border-radius: 18px;
+  box-shadow: 0 8px 28px rgba(60, 25, 85, 0.28);
+}
+.sludinajuma-popup .leaflet-popup-content {
+  margin: 16px 18px;
+}
+.sludinajuma-popup .leaflet-popup-close-button {
+  color: #3C1955;
+}
+
+.popup-karte {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.popup-karte .popup-nosaukums {
+  padding-right: 14px;          /* vieta aizvēršanas krustiņam */
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 1.2;
+  color: #3C1955;
+  word-break: break-word;
+}
+
+/* Cena violetā zīmītē */
+.popup-karte .popup-cena {
+  align-self: flex-start;
+  padding: 4px 12px;
+  background: #3C1955;
+  color: #FAF5FA;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+/* Rinda ar ikonu (attālums, laiks) */
+.popup-rinda {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #6b5a80;
+}
+.popup-ikona {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.popup-karte .popup-apraksts {
+  margin: 0;
+  max-width: none;
+  max-height: 120px;
+  overflow-y: auto;
+  font-size: 15px;
+  line-height: 1.4;
+  color: #444;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Apakšējā rinda: laiks pa kreisi, "Ziņot" pa labi */
+.popup-apakseja {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding-top: 10px;
+  border-top: 1px solid #efe7f6;
+}
+.popup-apakseja .zinot-btn {
+  margin: 0;
+}
+
+
+/* ===== FAVORĪTI: zvaigznīte, cilnes un favorītu saraksts ===== */
+
+/* Nosaukums un zvaigznīte vienā rindā */
+.popup-galva {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.sludinajuma-popup .popup-galva { padding-right: 16px; }   /* vieta aizvēršanas krustiņam */
+.popup-galva .popup-nosaukums { padding-right: 0; }
+
+/* Zvaigznīte: neaizpildīta = nav favorīts, dzeltena = favorīts */
+.zvaigzne-btn,
+.zvaigzne-btn:hover {
+  flex-shrink: 0;
+  padding: 2px;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: #3C1955;
+  line-height: 0;
+  cursor: pointer;
+}
+.zvaigzne-btn:hover { background: #F3EAFB; }
+.zvaigzne-btn svg {
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+.zvaigzne-btn.aktivs svg {
+  fill: #FFC400;
+  stroke: #C98F00;
+}
+
+/* Cilnes profilā */
+.profils-tabi {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.profils-tabi .profils-tab {
+  flex: 1;
+  padding: 10px 12px;
+  background: #F3EAFB;
+  color: #3C1955;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.profils-tabi .profils-tab:hover { background: #E6D9F5; }
+.profils-tabi .profils-tab.aktivs { background: #3C1955; color: #FAF5FA; }
+.profils-tabi .profils-tab.aktivs:hover { background: #281138; }
+
+/* Favorītu saraksts */
+.favorita-karte {
+  margin-bottom: 12px;
+  padding: 14px;
+  background: #F3EAFB;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: box-shadow 0.15s;
+}
+.favorita-karte:hover { box-shadow: 0 0 0 2px #cdb9e6; }
+.favorita-karte:focus-visible { outline: 3px solid #cbb8e8; }

@@ -36,6 +36,12 @@ var pinaIkonaMana = L.divIcon({
 // Pieslēgtā lietotāja id (null, ja nav pieslēdzies). To atjauno sadaļā 5.
 var manaLietotajaId = null;
 
+// Pin'u saraksts pēc sludinājuma id (lai favorītu sarakstā varētu atrast pin'u un to atvērt)
+var pinuMarkeri = {};
+
+// Pieslēgtā lietotāja favorītu sludinājumu id
+var manaFavoriti = new Set();
+
 // Pārvērš tekstu drošā formā (lai neviens nevar ievietot savu kodu)
 function drosiTeksts(teksts) {
   var d = document.createElement('div');
@@ -46,38 +52,161 @@ function drosiTeksts(teksts) {
 // Atsevišķs slānis pin'iem, lai tos var notīrīt un ielādēt no jauna
 var pinuSlanis = L.layerGroup().addTo(karte);
 
-function pievienotPinu(platums, garums, nosaukums, cena, apraksts, id, lietotajaId) {
-  var teksts =
-    '<div class="popup-nosaukums">' + drosiTeksts(nosaukums) + '</div>' +
-    '<div class="popup-cena">' + drosiTeksts(cena) + '€</div>';
+// Pārvērš datumu par tekstu: "Šodien, 14:32", "Vakar, 09:10" vai "12.11.2026., 18:05"
+function formatetLaiku(isoTeksts) {
+  var d = new Date(isoTeksts);
+  if (isNaN(d.getTime())) return '';
 
-  // Aprakstu rāda tikai tad, ja tas ir ierakstīts
-  if (apraksts) {
-    teksts += '<div class="popup-apraksts">' + drosiTeksts(apraksts) + '</div>';
+  var hhmm = d.toLocaleTimeString('lv-LV', { hour: '2-digit', minute: '2-digit' });
+  var tagad = new Date();
+  var sodienas = new Date(tagad.getFullYear(), tagad.getMonth(), tagad.getDate());
+  var dienaD = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  var starpiba = Math.round((sodienas - dienaD) / 86400000);   // dienu skaits
+
+  if (starpiba === 0) return 'Šodien, ' + hhmm;
+  if (starpiba === 1) return 'Vakar, ' + hhmm;
+  return d.toLocaleDateString('lv-LV') + ', ' + hhmm;
+}
+
+// Mazas līniju ikonas sludinājuma logam
+var IKONA_VIETA = '<svg class="popup-ikona" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
+var IKONA_LAIKS = '<svg class="popup-ikona" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+
+// Attālums līdz lietotājam kā teksts ("1,2 km no tevis"); tukšs, ja vieta nav zināma
+function attalumaTeksts(platums, garums) {
+  if (!manaVieta) return '';
+  var m = karte.distance(manaVieta.getLatLng(), [platums, garums]);
+  return m < 1000
+    ? Math.round(m) + ' m no tevis'
+    : (m / 1000).toFixed(1).replace('.', ',') + ' km no tevis';
+}
+
+// Zvaigznīte (favorīts). Poga pati atjauno savu izskatu pēc funkcijas atjaunot()
+function izveidotZvaigzni(gigId) {
+  var btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'zvaigzne-btn';
+  btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+
+  btn.atjaunot = function () {
+    var ir = manaFavoriti.has(gigId);
+    btn.classList.toggle('aktivs', ir);
+    btn.title = ir ? 'Noņemt no favorītiem' : 'Pievienot favorītiem';
+    btn.setAttribute('aria-pressed', ir ? 'true' : 'false');
+  };
+  btn.atjaunot();
+
+  btn.addEventListener('click', async function (e) {
+    e.stopPropagation();   // lai klikšķis neatver kartīti (favorītu sarakstā)
+    await pargretFavoritu(gigId);
+    btn.atjaunot();
+  });
+
+  return btn;
+}
+
+// Sludinājuma kartīte. To izmanto gan logs uz pin'a, gan favorītu saraksts profilā.
+// h ir sludinājuma ieraksts no datubāzes; ipasibas.popup = true rāda arī "Ziņot".
+function izveidotKartiti(h, ipasibas) {
+  var sakne = document.createElement('div');
+  sakne.className = 'popup-karte';
+
+  // 1. Nosaukums un zvaigznīte
+  var galva = document.createElement('div');
+  galva.className = 'popup-galva';
+
+  var virsraksts = document.createElement('div');
+  virsraksts.className = 'popup-nosaukums';
+  virsraksts.textContent = h.title;
+  galva.appendChild(virsraksts);
+
+  var zvaigzne = izveidotZvaigzni(h.id);
+  galva.appendChild(zvaigzne);
+  sakne.appendChild(galva);
+
+  // 2. Cena violetā zīmītē
+  var cenaZime = document.createElement('div');
+  cenaZime.className = 'popup-cena';
+  if (h.price === null || h.price === undefined || h.price === '') {
+    cenaZime.textContent = 'Cena pēc vienošanās';
+  } else {
+    var c = Number(h.price);
+    cenaZime.textContent = '€' + (Number.isInteger(c) ? c : c.toFixed(2));
+  }
+  sakne.appendChild(cenaZime);
+
+  // 3. Attālums no lietotāja (rādās tikai, ja atrašanās vieta ir noteikta)
+  var attalumaRinda = document.createElement('div');
+  attalumaRinda.className = 'popup-rinda';
+  attalumaRinda.style.display = 'none';
+  attalumaRinda.innerHTML = IKONA_VIETA + '<span class="popup-attalums"></span>';
+  sakne.appendChild(attalumaRinda);
+
+  // 4. Apraksts
+  if (h.description) {
+    var aprakstsEl = document.createElement('div');
+    aprakstsEl.className = 'popup-apraksts';
+    aprakstsEl.textContent = h.description;
+    sakne.appendChild(aprakstsEl);
   }
 
-  // Popup saturu veidojam kā elementu, lai varētu pievienot pogu "Ziņot"
-  var saturs = document.createElement('div');
-  saturs.innerHTML = teksts;
+  // 5. Apakšējā rinda: laiks kreisajā pusē, "Ziņot" labajā pusē
+  var apaksa = document.createElement('div');
+  apaksa.className = 'popup-apakseja';
 
-  var btnZinot = document.createElement('button');
-  btnZinot.type = 'button';
-  btnZinot.className = 'zinot-btn';
-  btnZinot.textContent = '⚑ Ziņot';
-  btnZinot.addEventListener('click', function () {
-    atvertZinosanu(id);
-  });
-  saturs.appendChild(btnZinot);
+  var laiksEl = document.createElement('div');
+  laiksEl.className = 'popup-rinda';
+  var laiksTeksts = h.created_at ? formatetLaiku(h.created_at) : '';
+  if (laiksTeksts) {
+    laiksEl.innerHTML = IKONA_LAIKS + '<span class="popup-laiks"></span>';
+    laiksEl.querySelector('.popup-laiks').textContent = laiksTeksts;
+  }
+  apaksa.appendChild(laiksEl);
+
+  if (ipasibas && ipasibas.popup) {
+    var btnZinot = document.createElement('button');
+    btnZinot.type = 'button';
+    btnZinot.className = 'zinot-btn';
+    btnZinot.textContent = '⚑ Ziņot';
+    btnZinot.addEventListener('click', function () {
+      atvertZinosanu(h.id);
+    });
+    apaksa.appendChild(btnZinot);
+  }
+  sakne.appendChild(apaksa);
+
+  return {
+    sakne: sakne,
+    zvaigzne: zvaigzne,
+    atjaunotAttalumu: function () {
+      var t = attalumaTeksts(h.lat, h.lon);
+      attalumaRinda.querySelector('.popup-attalums').textContent = t;
+      attalumaRinda.style.display = t ? 'flex' : 'none';
+    }
+  };
+}
+
+// Uzliek pin'u kartē; uzspiežot atveras sludinājuma kartīte
+function pievienotPinu(h) {
+  var kartite = izveidotKartiti(h, { popup: true });
 
   // Vai šis sludinājums pieder pieslēgtajam lietotājam?
-  var irMans = manaLietotajaId !== null && lietotajaId === manaLietotajaId;
+  var irMans = manaLietotajaId !== null && h.user_id === manaLietotajaId;
 
-  L.marker([platums, garums], {
+  var pins = L.marker([h.lat, h.lon], {
     icon: irMans ? pinaIkonaMana : pinaIkona,
     zIndexOffset: irMans ? 1000 : 0     // savi pin'i vienmēr virs pārējiem
   })
     .addTo(pinuSlanis)
-    .bindPopup(saturs);
+    .bindPopup(kartite.sakne, { minWidth: 240, maxWidth: 320, className: 'sludinajuma-popup' });
+
+  pinuMarkeri[h.id] = pins;
+
+  // Kad logs atveras: atjauno attālumu un zvaigznītes stāvokli
+  pins.on('popupopen', function () {
+    kartite.atjaunotAttalumu();
+    kartite.zvaigzne.atjaunot();
+  });
 }
 
 
@@ -130,8 +259,9 @@ function pielietotFiltrus() {
   });
 
   pinuSlanis.clearLayers();
+  pinuMarkeri = {};
   atlasitas.forEach(function (h) {
-    pievienotPinu(h.lat, h.lon, h.title, h.price, h.description, h.id, h.user_id);
+    pievienotPinu(h);
   });
 
   document.getElementById('f-rezultati').textContent =
@@ -365,6 +495,14 @@ sb.auth.onAuthStateChange(function (notikums, sesija) {
   document.getElementById('btn-iziet').style.display = pieslegts ? 'inline-block' : 'none';
   document.getElementById('btn-mani').style.display = pieslegts ? 'inline-block' : 'none';
   document.getElementById('btn-pievienot').style.display = pieslegts ? 'inline-block' : 'none';
+
+  // Favorīti: ielādē pēc pieslēgšanās, notīra pēc iziešanas
+  // (setTimeout, lai neizsauktu Supabase tieši šajā funkcijā)
+  if (pieslegts) {
+    setTimeout(ieladetFavoritusId, 0);
+  } else {
+    manaFavoriti = new Set();
+  }
 });
 
 
@@ -512,6 +650,7 @@ kategorijas.forEach(function (k) {
 });
 
 document.getElementById('btn-mani').addEventListener('click', function () {
+  rodiProfilaTabu('sludinajumi');
   maniLogs.showModal();
   ieladetManus();
 });
@@ -644,11 +783,56 @@ function izveidotRindu(h) {
 // Kategoriju pogas izveido no esošā saraksta
 var chipsVieta = document.getElementById('f-kategorijas');
 
+// IKONAS PIE KATEGORIJĀM
+// Pie katras kategorijas ieraksti ceļu uz savu ikonu, piemēram:
+//   'Dārza darbi': 'ikonas/darza-darbi.svg',
+// Atstāj '' (tukšu), ja ikonas vēl nav. Nosaukumam jāsakrīt ar sarakstu "kategorijas".
+var kategorijuIkonas = {
+  'Dārza darbi': '',
+  'Malka un pagalms': '',
+  'Sniega tīrīšana': '',
+  'Pārvākšana un nešana': '',
+  'Uzkopšana': '',
+  'Sīki remonti': '',
+  'Dzīvnieku pieskatīšana': '',
+  'Citi': ''
+};
+
+// Vai vismaz vienai kategorijai ir ikona? (ja jā, visām rezervē vietu, lai teksts sakrīt)
+var irKadaIkona = Object.keys(kategorijuIkonas).some(function (k) {
+  return kategorijuIkonas[k] !== '';
+});
+
 kategorijas.forEach(function (k) {
   var chip = document.createElement('button');
   chip.type = 'button';
   chip.className = 'chip';
-  chip.textContent = k;
+
+  // Ikona (pa kreisi)
+  if (irKadaIkona) {
+    var ikona;
+    if (kategorijuIkonas[k]) {
+      ikona = document.createElement('img');
+      ikona.src = kategorijuIkonas[k];
+      ikona.alt = '';
+    } else {
+      ikona = document.createElement('span');   // tukša vieta
+    }
+    ikona.className = 'chip-ikona';
+    chip.appendChild(ikona);
+  }
+
+  // Nosaukums
+  var teksts = document.createElement('span');
+  teksts.className = 'chip-teksts';
+  teksts.textContent = k;
+  chip.appendChild(teksts);
+
+  // Ķeksītis (redzams tikai aktīvai kategorijai)
+  var ok = document.createElement('span');
+  ok.className = 'chip-ok';
+  ok.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
+  chip.appendChild(ok);
 
   chip.addEventListener('click', function () {
     var vieta = izveletasKategorijas.indexOf(k);
@@ -798,4 +982,143 @@ document.getElementById('btn-z-sutit').addEventListener('click', async function 
 
   zinotLogs.close();
   alert('Paldies! Ziņojums nosūtīts.');
+});
+
+
+// ========== 11. FAVORĪTI ==========
+
+// Ielasa lietotāja favorītu id (lai zvaigznītes būtu pareizi aizpildītas)
+async function ieladetFavoritusId() {
+  var r = await sb.from('favorites').select('gig_id');
+  if (r.error) {
+    console.error('Favorīti:', r.error.message);
+    return;
+  }
+  manaFavoriti = new Set(r.data.map(function (f) { return f.gig_id; }));
+}
+
+// Pievieno vai noņem favorītu. Atgriež true, ja izdevās.
+async function pargretFavoritu(gigId) {
+  var sesija = await sb.auth.getSession();
+  if (!sesija.data.session) {
+    atvertAuth('login', 'Lai saglabātu favorītus, jāpieslēdzas.');
+    return false;
+  }
+  var lietotajaId = sesija.data.session.user.id;
+
+  if (manaFavoriti.has(gigId)) {
+    var d = await sb.from('favorites').delete()
+      .eq('gig_id', gigId)
+      .eq('user_id', lietotajaId);
+    if (d.error) {
+      paradiPazinojumu(latviskaKluda(d.error), 3500);
+      return false;
+    }
+    manaFavoriti.delete(gigId);
+  } else {
+    var i = await sb.from('favorites').insert({ gig_id: gigId, user_id: lietotajaId });
+    if (i.error) {
+      paradiPazinojumu(latviskaKluda(i.error), 3500);
+      return false;
+    }
+    manaFavoriti.add(gigId);
+  }
+
+  // Ja favorītu saraksts profilā ir atvērts, atsvaidzina to
+  if (maniLogs.open && !document.getElementById('panelis-favoriti').hidden) {
+    ieladetFavoritus();
+  }
+  return true;
+}
+
+// Atver sludinājumu kartē: pārceļ karti uz pin'u un atver tā kartīti
+async function atvertSludinajumu(id) {
+  maniLogs.close();
+  document.getElementById('filtri-panel').classList.remove('atverts');
+
+  var atrasts = visasHalturas.some(function (g) { return g.id === id; });
+  if (!atrasts) {
+    await ieladetPinus();   // varbūt sludinājums pievienots pēc lapas ielādes
+    atrasts = visasHalturas.some(function (g) { return g.id === id; });
+  }
+  if (!atrasts) {
+    paradiPazinojumu('Šis sludinājums vairs nav pieejams.', 3500);
+    return;
+  }
+
+  var pins = pinuMarkeri[id];
+  if (!pins) {
+    // Pin'š ir paslēpts ar filtriem: notīra filtrus
+    document.getElementById('btn-notirit').click();
+    pins = pinuMarkeri[id];
+  }
+  if (!pins) return;
+
+  karte.setView(pins.getLatLng(), Math.max(karte.getZoom(), 15), { animate: false });
+  pins.openPopup();
+}
+
+// Ielasa un parāda favorītu sarakstu profilā
+async function ieladetFavoritus() {
+  var vieta = document.getElementById('favoritu-saraksts');
+  vieta.textContent = 'Ielādē...';
+
+  var r = await sb.from('favorites')
+    .select('gig_id, created_at, gigs(*)')
+    .order('created_at', { ascending: false });
+
+  if (r.error) {
+    vieta.textContent = latviskaKluda(r.error);
+    return;
+  }
+
+  // Atstāj tikai sludinājumus, kas vēl pastāv un nav paslēpti vai beigušies
+  var saraksts = r.data
+    .map(function (f) { return f.gigs; })
+    .filter(function (g) {
+      return g && !g.hidden && new Date(g.expires_at).getTime() > Date.now();
+    });
+
+  vieta.textContent = '';
+
+  if (saraksts.length === 0) {
+    vieta.textContent = 'Tev vēl nav favorītu. Uzspied ☆ uz sludinājuma kartē, lai to saglabātu šeit.';
+    return;
+  }
+
+  saraksts.forEach(function (h) {
+    var kartite = izveidotKartiti(h, { popup: false });
+    kartite.atjaunotAttalumu();
+
+    // Visa kartīte ir uzspiežama: aizved uz pin'u kartē
+    var kaste = document.createElement('div');
+    kaste.className = 'favorita-karte';
+    kaste.tabIndex = 0;
+    kaste.setAttribute('role', 'button');
+    kaste.appendChild(kartite.sakne);
+
+    kaste.addEventListener('click', function () { atvertSludinajumu(h.id); });
+    kaste.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') atvertSludinajumu(h.id);
+    });
+
+    vieta.appendChild(kaste);
+  });
+}
+
+// Profila cilnes: "Mani sludinājumi" | "Favorīti"
+function rodiProfilaTabu(tabs) {
+  var favoriti = (tabs === 'favoriti');
+  document.getElementById('panelis-sludinajumi').hidden = favoriti;
+  document.getElementById('panelis-favoriti').hidden = !favoriti;
+  document.getElementById('tab-sludinajumi').classList.toggle('aktivs', !favoriti);
+  document.getElementById('tab-favoriti').classList.toggle('aktivs', favoriti);
+  if (favoriti) ieladetFavoritus();
+}
+
+document.getElementById('tab-sludinajumi').addEventListener('click', function () {
+  rodiProfilaTabu('sludinajumi');
+});
+document.getElementById('tab-favoriti').addEventListener('click', function () {
+  rodiProfilaTabu('favoriti');
 });
