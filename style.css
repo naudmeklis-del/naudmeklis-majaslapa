@@ -1250,3 +1250,20 @@ dialog textarea {
   }
   .footer a + a::before { display: none; }   /* šaurā ekrānā svītriņas nav vajadzīgas */
 }
+
+
+/* ===== Filtru slēdži: teksts vienā rindā arī tad, ja panelim ir ritjosla ===== */
+.filtri-panel label:has(.ampaksats-check) {
+  font-size: 15px;
+  gap: 8px;
+  white-space: nowrap;
+}
+.filtri-panel .ampaksats-check {
+  width: 44px;
+  height: 24px;
+}
+.filtri-panel .ampaksats-check::before {
+  width: 18px;
+  height: 18px;
+}
+.filtri-panel .ampaksats-check:checked::before { transform: translateX(20px); }
