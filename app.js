@@ -33,6 +33,26 @@ var pinaIkonaMana = L.divIcon({
   popupAnchor: [0, -45]
 });
 
+// Darba meklētāju pin'i: cits izskats (cilvēka ikona vietā €), lai tos var atšķirt no haltūrām
+var IKONA_CILVEKS = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>';
+
+var pinaIkonaMeklejs = L.divIcon({
+  className: '',
+  html: '<div class="pins pins-meklejs"><span>' + IKONA_CILVEKS + '</span></div>',
+  iconSize: [36, 36],
+  iconAnchor: [18, 43],
+  popupAnchor: [0, -45]
+});
+
+// Tāds pats, bet ar dzeltenu apmali: PAŠA lietotāja sludinājums
+var pinaIkonaMeklejsMana = L.divIcon({
+  className: '',
+  html: '<div class="pins pins-meklejs pins-mana"><span>' + IKONA_CILVEKS + '</span></div>',
+  iconSize: [36, 36],
+  iconAnchor: [18, 43],
+  popupAnchor: [0, -45]
+});
+
 // Pieslēgtā lietotāja id (null, ja nav pieslēdzies). To atjauno sadaļā 5.
 var manaLietotajaId = null;
 
@@ -210,9 +230,92 @@ function pievienotPinu(h) {
 }
 
 
+// Darba meklētāja kartīte (bez zvaigznītes un "Ziņot": tās darbojas tikai haltūrām)
+var IKONA_TALRUNIS = '<svg class="popup-ikona" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
+
+function izveidotMeklejaKartiti(m) {
+  var sakne = document.createElement('div');
+  sakne.className = 'popup-karte';
+
+  // 1. Vārds un uzvārds
+  var virsraksts = document.createElement('div');
+  virsraksts.className = 'popup-nosaukums';
+  virsraksts.textContent = m.first_name + (m.last_name ? ' ' + m.last_name : '');
+  sakne.appendChild(virsraksts);
+
+  // 2. Violetā zīmīte
+  var zime = document.createElement('div');
+  zime.className = 'popup-cena';
+  zime.textContent = 'Meklē darbu';
+  sakne.appendChild(zime);
+
+  // 3. Attālums no lietotāja
+  var attalumaRinda = document.createElement('div');
+  attalumaRinda.className = 'popup-rinda';
+  attalumaRinda.style.display = 'none';
+  attalumaRinda.innerHTML = IKONA_VIETA + '<span class="popup-attalums"></span>';
+  sakne.appendChild(attalumaRinda);
+
+  // 4. Apraksts
+  if (m.description) {
+    var aprakstsEl = document.createElement('div');
+    aprakstsEl.className = 'popup-apraksts';
+    aprakstsEl.textContent = m.description;
+    sakne.appendChild(aprakstsEl);
+  }
+
+  // 5. Kontaktinformācija
+  var kontaktuRinda = document.createElement('div');
+  kontaktuRinda.className = 'popup-rinda popup-kontakti-rinda';
+  kontaktuRinda.innerHTML = IKONA_TALRUNIS + '<span class="popup-kontakti"></span>';
+  kontaktuRinda.querySelector('.popup-kontakti').textContent = m.contact;
+  sakne.appendChild(kontaktuRinda);
+
+  // 6. Laiks
+  var apaksa = document.createElement('div');
+  apaksa.className = 'popup-apakseja';
+  var laiksEl = document.createElement('div');
+  laiksEl.className = 'popup-rinda';
+  var laiksTeksts = m.created_at ? formatetLaiku(m.created_at) : '';
+  if (laiksTeksts) {
+    laiksEl.innerHTML = IKONA_LAIKS + '<span class="popup-laiks"></span>';
+    laiksEl.querySelector('.popup-laiks').textContent = laiksTeksts;
+  }
+  apaksa.appendChild(laiksEl);
+  sakne.appendChild(apaksa);
+
+  return {
+    sakne: sakne,
+    atjaunotAttalumu: function () {
+      var t = attalumaTeksts(m.lat, m.lon);
+      attalumaRinda.querySelector('.popup-attalums').textContent = t;
+      attalumaRinda.style.display = t ? 'flex' : 'none';
+    }
+  };
+}
+
+// Uzliek darba meklētāja pin'u kartē
+function pievienotMeklejaPinu(m) {
+  var kartite = izveidotMeklejaKartiti(m);
+  var irMans = manaLietotajaId !== null && m.user_id === manaLietotajaId;
+
+  var pins = L.marker([m.lat, m.lon], {
+    icon: irMans ? pinaIkonaMeklejsMana : pinaIkonaMeklejs,
+    zIndexOffset: irMans ? 1000 : 0
+  })
+    .addTo(pinuSlanis)
+    .bindPopup(kartite.sakne, { minWidth: 240, maxWidth: 320, className: 'sludinajuma-popup' });
+
+  pins.on('popupopen', function () {
+    kartite.atjaunotAttalumu();
+  });
+}
+
+
 // ========== 4. DATU IELASĪŠANA UN FILTRI ==========
 
 var visasHalturas = [];          // visas ielasītās haltūras
+var visiMeklejie = [];           // visi ielasītie darba meklētāji
 var izveletasKategorijas = [];   // kategorijas, ko lietotājs atzīmējis
 
 async function ieladetPinus() {
@@ -226,6 +329,15 @@ async function ieladetPinus() {
   }
 
   visasHalturas = rezultats.data;   // iegaumējam visu sarakstu
+
+  // Darba meklētāji. Ja kaut kas noiet greizi, haltūras tāpat tiek rādītas.
+  var meklejuRez = await sb.from('seekers').select('*').eq('hidden', false);
+  if (meklejuRez.error) {
+    console.error('Darba meklētāji:', meklejuRez.error.message);
+    visiMeklejie = [];
+  } else {
+    visiMeklejie = meklejuRez.data;
+  }
   atjaunotKategorijuSkaitu();       // uzliek skaitļus uz kategoriju pogām
   pielietotFiltrus();               // un parādām to, kas atbilst filtriem
 }
@@ -237,7 +349,10 @@ function pielietotFiltrus() {
   var max = document.getElementById('f-max').value;
   var tikaiApmaksatas = document.getElementById('f-apmaksatas').checked;
 
-  var atlasitas = visasHalturas.filter(function (h) {
+  var rodiPiedavajumus = document.getElementById('f-rodit-piedavajumus').checked;
+  var rodiMeklejus = document.getElementById('f-rodit-mekletajus').checked;
+
+  var atlasitas = !rodiPiedavajumus ? [] : visasHalturas.filter(function (h) {
 
     // Meklēšana nosaukumā un aprakstā
     if (meklet !== '') {
@@ -259,14 +374,32 @@ function pielietotFiltrus() {
     return true;   // visi nosacījumi izpildīti
   });
 
+  // Darba meklētājiem nav kategorijas un cenas, tāpēc, kamēr kāds no šiem filtriem
+  // ir aktīvs, viņi netiek rādīti. Meklēšana darbojas pēc vārda un apraksta.
+  var kategorijaVaiCenaAktiva = izveletasKategorijas.length > 0 ||
+    min !== '' || max !== '' || tikaiApmaksatas;
+
+  var atlasitiMeklejie = (!rodiMeklejus || kategorijaVaiCenaAktiva) ? [] :
+    visiMeklejie.filter(function (m) {
+      if (meklet === '') return true;
+      var teksts = (m.first_name + ' ' + (m.last_name || '') + ' ' + (m.description || '')).toLowerCase();
+      return teksts.indexOf(meklet) !== -1;
+    });
+
   pinuSlanis.clearLayers();
   pinuMarkeri = {};
   atlasitas.forEach(function (h) {
     pievienotPinu(h);
   });
+  atlasitiMeklejie.forEach(function (m) {
+    pievienotMeklejaPinu(m);
+  });
 
+  var rezultatuDalas = [];
+  if (rodiPiedavajumus) rezultatuDalas.push('Atrastas haltūras: ' + atlasitas.length);
+  if (rodiMeklejus) rezultatuDalas.push('Darba meklētāji: ' + atlasitiMeklejie.length);
   document.getElementById('f-rezultati').textContent =
-    'Atrastas haltūras: ' + atlasitas.length;
+    rezultatuDalas.length > 0 ? rezultatuDalas.join(' · ') : 'Atzīmē, ko rādīt kartē';
 }
 
 // Uzliek katras kategorijas pogai sludinājumu skaitu (skaita visus ielādētos sludinājumus)
@@ -502,7 +635,7 @@ document.getElementById('btn-iziet').addEventListener('click', async function ()
 sb.auth.onAuthStateChange(function (notikums, sesija) {
   var pieslegts = sesija !== null;
   manaLietotajaId = pieslegts ? sesija.user.id : null;
-  if (visasHalturas.length > 0) pielietotFiltrus();   // pārzīmē pin'us, lai savi sludinājumi iegūtu dzelteno apmali
+  if (visasHalturas.length > 0 || visiMeklejie.length > 0) pielietotFiltrus();   // pārzīmē pin'us, lai savi sludinājumi iegūtu dzelteno apmali
   document.getElementById('btn-pieslegties').style.display = pieslegts ? 'none' : 'inline-block';
   document.getElementById('btn-iziet').style.display = pieslegts ? 'inline-block' : 'none';
   document.getElementById('btn-mani').style.display = pieslegts ? 'inline-block' : 'none';
@@ -549,16 +682,46 @@ var gaidaKlikski = false;
 var izveletaVieta = null;
 var pagaiduPins = null;
 
+var izveleLogs = document.getElementById('pievienot-izvele-logs');
+var seviLogs = document.getElementById('sevi-logs');
+var sZinojums = document.getElementById('s-zinojums');
+var pievienosanasVeids = 'haltura';   // 'haltura' vai 'sevi': ko šobrīd pievieno
+
+// Poga "Pievienot": atver izvēles logu (ja lietotājs ir pieslēdzies)
 document.getElementById('btn-pievienot').addEventListener('click', async function () {
   var sesija = await sb.auth.getSession();
 
   if (!sesija.data.session) {
-    atvertAuth('login', 'Lai pievienotu haltūru, jāpieslēdzas.');
+    atvertAuth('login', 'Lai pievienotu sludinājumu, jāpieslēdzas.');
     return;
   }
 
-  // Pārbauda, vai lietotājam jau nav pieļaujamais sludinājumu skaits
-  var skaits = await sb.from('gigs')
+  izveleLogs.showModal();
+});
+
+document.getElementById('btn-izvele-atcelt').addEventListener('click', function () {
+  izveleLogs.close();
+});
+document.getElementById('btn-izvele-haltura').addEventListener('click', function () {
+  saktPievienosanu('haltura');
+});
+document.getElementById('btn-izvele-sevi').addEventListener('click', function () {
+  saktPievienosanu('sevi');
+});
+
+// Kopīga sākšana abiem veidiem: pārbauda limitu un gaida klikšķi kartē
+async function saktPievienosanu(veids) {
+  izveleLogs.close();
+
+  var sesija = await sb.auth.getSession();
+  if (!sesija.data.session) {
+    atvertAuth('login', 'Lai pievienotu sludinājumu, jāpieslēdzas.');
+    return;
+  }
+
+  // Pārbauda, vai lietotājam jau nav pieļaujamais sludinājumu skaits (katrai tabulai atsevišķi)
+  var tabula = (veids === 'sevi') ? 'seekers' : 'gigs';
+  var skaits = await sb.from(tabula)
     .select('id', { count: 'exact', head: true })
     .eq('user_id', sesija.data.session.user.id);
 
@@ -567,9 +730,12 @@ document.getElementById('btn-pievienot').addEventListener('click', async functio
     return;
   }
 
+  pievienosanasVeids = veids;
   gaidaKlikski = true;
-  alert('Uzklikšķini kartē vietā, kur ir haltūra.');
-});
+  alert(veids === 'sevi'
+    ? 'Uzklikšķini kartē aptuvenā vietā, kur vēlies, lai tevi atrod.'
+    : 'Uzklikšķini kartē vietā, kur ir haltūra.');
+}
 
 karte.on('click', function (e) {
   if (!gaidaKlikski) return;
@@ -579,8 +745,13 @@ karte.on('click', function (e) {
   if (pagaiduPins) karte.removeLayer(pagaiduPins);
   pagaiduPins = L.marker(e.latlng).addTo(karte);
 
-  hZinojums.textContent = '';
-  halturaLogs.showModal();
+  if (pievienosanasVeids === 'sevi') {
+    sZinojums.textContent = '';
+    seviLogs.showModal();
+  } else {
+    hZinojums.textContent = '';
+    halturaLogs.showModal();
+  }
 });
 
 document.getElementById('btn-atcelt').addEventListener('click', function () {
@@ -635,6 +806,68 @@ document.getElementById('btn-saglabat').addEventListener('click', async function
 });
 
 
+// ---------- "Pievienot sevi": darba meklētāja saglabāšana ----------
+document.getElementById('btn-s-atcelt').addEventListener('click', function () {
+  seviLogs.close();
+  if (pagaiduPins) karte.removeLayer(pagaiduPins);
+});
+
+document.getElementById('btn-s-saglabat').addEventListener('click', async function () {
+  var vards = document.getElementById('s-vards').value.trim();
+  var uzvards = document.getElementById('s-uzvards').value.trim();
+  var kontakti = document.getElementById('s-kontakti').value.trim();
+  var apraksts = document.getElementById('s-apraksts').value.trim();
+
+  if (vards === '') {
+    sZinojums.textContent = 'Ieraksti vārdu.';
+    return;
+  }
+  if (kontakti === '') {
+    sZinojums.textContent = 'Ieraksti kontaktinformāciju.';
+    return;
+  }
+  if (apraksts === '') {
+    sZinojums.textContent = 'Uzraksti aprakstu.';
+    return;
+  }
+
+  var sesija = await sb.auth.getSession();
+  var lietotajs = sesija.data.session.user;
+
+  var rezultats = await sb.from('seekers').insert({
+    first_name: vards,
+    last_name: uzvards === '' ? null : uzvards,
+    contact: kontakti,
+    description: apraksts,
+    lat: izveletaVieta.lat,
+    lon: izveletaVieta.lng,
+    user_id: lietotajs.id
+  });
+
+  if (rezultats.error) {
+    // Datubāzes limits (P0001): aizveram logu un parādām paziņojumu ekrāna vidū
+    if (rezultats.error.code === 'P0001') {
+      if (pagaiduPins) karte.removeLayer(pagaiduPins);
+      seviLogs.close();
+      paradiPazinojumu(LIMITA_TEKSTS, 4000);
+      return;
+    }
+    sZinojums.textContent = latviskaKluda(rezultats.error);
+    return;
+  }
+
+  if (pagaiduPins) karte.removeLayer(pagaiduPins);
+  ieladetPinus();   // pārlādē visus pin'us no datubāzes
+
+  document.getElementById('s-vards').value = '';
+  document.getElementById('s-uzvards').value = '';
+  document.getElementById('s-kontakti').value = '';
+  document.getElementById('s-apraksts').value = '';
+  seviLogs.close();
+  paradiPazinojumu('✓ Sludinājums veiksmīgi pievienots!');
+});
+
+
 // ========== 7. MANS PROFILS (profils + mani sludinājumi) ==========
 
 var maniLogs = document.getElementById('mani-logs');
@@ -682,9 +915,11 @@ async function ieladetManus() {
   document.getElementById('profils-avatars').textContent =
     epasts ? epasts.charAt(0).toUpperCase() : '?';
 
+  var lietotajaId = sesija.data.session.user.id;
+
   var rezultats = await sb.from('gigs')
     .select('*')
-    .eq('user_id', sesija.data.session.user.id)
+    .eq('user_id', lietotajaId)
     .order('created_at', { ascending: false });
 
   if (rezultats.error) {
@@ -692,15 +927,28 @@ async function ieladetManus() {
     return;
   }
 
+  var meklejuRezultats = await sb.from('seekers')
+    .select('*')
+    .eq('user_id', lietotajaId)
+    .order('created_at', { ascending: false });
+
+  if (meklejuRezultats.error) {
+    maniSaraksts.textContent = latviskaKluda(meklejuRezultats.error);
+    return;
+  }
+
   maniSaraksts.textContent = '';
 
-  if (rezultats.data.length === 0) {
+  if (rezultats.data.length === 0 && meklejuRezultats.data.length === 0) {
     maniSaraksts.textContent = 'Tev vēl nav sludinājumu.';
     return;
   }
 
   rezultats.data.forEach(function (h) {
     maniSaraksts.appendChild(izveidotRindu(h));
+  });
+  meklejuRezultats.data.forEach(function (m) {
+    maniSaraksts.appendChild(izveidotMeklejaRindu(m));
   });
 }
 
@@ -784,6 +1032,89 @@ function izveidotRindu(h) {
   rinda.append(info, document.createElement('br'),
     nosaukumsLauks, ' ', kategorijaLauks, ' ', cenaLauks, ' €',
     document.createElement('br'), aprakstsLauks,
+    document.createElement('br'), btnSaglabat, ' ', btnDzest);
+
+  return rinda;
+}
+
+
+// Izveido vienu darba meklētāja sludinājuma rindu ar laukiem un pogām
+function izveidotMeklejaRindu(m) {
+  var rinda = document.createElement('div');
+  rinda.style.borderBottom = '1px solid #ddd';
+  rinda.style.padding = '10px 0';
+
+  var datums = new Date(m.created_at).toLocaleString('lv-LV');
+  var dienas = Math.ceil((new Date(m.expires_at) - new Date()) / 86400000);
+  var info = document.createElement('small');
+  info.textContent = 'Darba meklētājs · Pievienots: ' + datums + ' (beigsies pēc ' + dienas + ' d.)';
+  if (m.hidden) info.textContent += ' – PASLĒPTS';
+
+  var vardsLauks = document.createElement('input');
+  vardsLauks.value = m.first_name;
+  vardsLauks.placeholder = 'Vārds';
+  vardsLauks.maxLength = 50;
+
+  var uzvardsLauks = document.createElement('input');
+  uzvardsLauks.value = m.last_name || '';
+  uzvardsLauks.placeholder = 'Uzvārds (nav obligāts)';
+  uzvardsLauks.maxLength = 50;
+
+  var kontaktiLauks = document.createElement('input');
+  kontaktiLauks.value = m.contact;
+  kontaktiLauks.placeholder = 'Kontaktinformācija';
+  kontaktiLauks.maxLength = 150;
+
+  var aprakstsLauks = document.createElement('textarea');
+  aprakstsLauks.value = m.description || '';
+  aprakstsLauks.rows = 3;
+  aprakstsLauks.maxLength = 500;
+  aprakstsLauks.style.width = '100%';
+
+  var btnSaglabat = document.createElement('button');
+  btnSaglabat.textContent = 'Saglabāt';
+  btnSaglabat.addEventListener('click', async function () {
+    if (vardsLauks.value.trim() === '' || kontaktiLauks.value.trim() === '' ||
+        aprakstsLauks.value.trim() === '') {
+      alert('Vārds, kontaktinformācija un apraksts ir obligāti.');
+      return;
+    }
+
+    var r = await sb.from('seekers').update({
+      first_name: vardsLauks.value.trim(),
+      last_name: uzvardsLauks.value.trim() || null,
+      contact: kontaktiLauks.value.trim(),
+      description: aprakstsLauks.value.trim()
+    }).eq('id', m.id);
+
+    if (r.error) {
+      alert(latviskaKluda(r.error));
+    } else {
+      alert('Saglabāts!');
+      ieladetPinus();
+    }
+  });
+
+  var btnDzest = document.createElement('button');
+  btnDzest.textContent = 'Dzēst';
+  btnDzest.addEventListener('click', async function () {
+    if (!confirm('Tiešām dzēst šo sludinājumu?')) return;
+
+    var r = await sb.from('seekers').delete().eq('id', m.id);
+
+    if (r.error) {
+      alert(latviskaKluda(r.error));
+    } else {
+      ieladetManus();
+      ieladetPinus();
+    }
+  });
+
+  rinda.append(info, document.createElement('br'),
+    vardsLauks, document.createElement('br'),
+    uzvardsLauks, document.createElement('br'),
+    kontaktiLauks, document.createElement('br'),
+    aprakstsLauks,
     document.createElement('br'), btnSaglabat, ' ', btnDzest);
 
   return rinda;
@@ -875,6 +1206,8 @@ atjaunotKategorijuSkaitu();   // ja sludinājumi jau ielādēti, uzreiz uzliek s
   document.getElementById(id).addEventListener('input', pielietotFiltrus);
 });
 document.getElementById('f-apmaksatas').addEventListener('change', pielietotFiltrus);
+document.getElementById('f-rodit-piedavajumus').addEventListener('change', pielietotFiltrus);
+document.getElementById('f-rodit-mekletajus').addEventListener('change', pielietotFiltrus);
 
 // Notīrīt visus filtrus
 document.getElementById('btn-notirit').addEventListener('click', function () {
@@ -882,6 +1215,8 @@ document.getElementById('btn-notirit').addEventListener('click', function () {
   document.getElementById('f-min').value = '';
   document.getElementById('f-max').value = '';
   document.getElementById('f-apmaksatas').checked = false;
+  document.getElementById('f-rodit-piedavajumus').checked = true;
+  document.getElementById('f-rodit-mekletajus').checked = true;
   izveletasKategorijas = [];
   document.querySelectorAll('.chip').forEach(function (c) {
     c.classList.remove('aktivs');

@@ -29,7 +29,7 @@
     <div>
       <button id="btn-filtri" class="pievienot-btn filtri-btn">Filtri</button>
       <button id="btn-mani" style="display: none;" class="manisludinajumi-btn">Mans profils</button>
-      <button id="btn-pievienot" style="display: none;" class="pievienot-btn">Pievienot haltūru</button>
+      <button id="btn-pievienot" style="display: none;" class="pievienot-btn">Pievienot</button>
       <button id="btn-pieslegties" class="pieslegties-btn">Pieslēgties / Reģistrēties</button>
       <button id="btn-iziet" style="display: none;" class="iziet-btn">Iziet</button>
     </div>
@@ -56,6 +56,14 @@
     <div class="filtri-meklet">
       <svg class="ikona" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input type="text" id="f-meklet" placeholder="Meklēt" aria-label="Meklēt">
+    </div>
+
+    <!-- Ko rādīt kartē: darba piedāvājumus un/vai darba meklētājus -->
+    <div class="filtri-sadala">
+      <div class="sledzi-grupa">
+        <label><input class="ampaksats-check" type="checkbox" id="f-rodit-piedavajumus" checked> Rādīt darba piedāvājumus</label>
+        <label><input class="ampaksats-check" type="checkbox" id="f-rodit-mekletajus" checked> Rādīt darba meklētājus</label>
+      </div>
     </div>
 
     <!-- Kategorijas (pogas tiek izveidotas no app.js) -->
@@ -157,6 +165,24 @@
   </div>
 </dialog>
 
+<!-- Izvēle: ko pievienot (atveras, uzspiežot "Pievienot") -->
+<dialog id="pievienot-izvele-logs">
+  <h3 class="authdialog-title">Ko vēlies pievienot?</h3>
+  <div class="izvele-pogas">
+    <button type="button" id="btn-izvele-haltura" class="izvele-poga">
+      <span class="izvele-nosaukums">Pievienot haltūru</span>
+      <span class="izvele-apraksts">Man ir darbs, ko kāds var paveikt</span>
+    </button>
+    <button type="button" id="btn-izvele-sevi" class="izvele-poga">
+      <span class="izvele-nosaukums">Pievienot sevi</span>
+      <span class="izvele-apraksts">Es meklēju darbu</span>
+    </button>
+  </div>
+  <div class="auth-aizvert-rinda">
+    <button type="button" id="btn-izvele-atcelt">Atcelt</button>
+  </div>
+</dialog>
+
 <dialog id="haltura-logs">
   <h3>Pievienot haltūru</h3>
   <input type="text" id="h-nosaukums" placeholder="Nosaukums"><br><br>
@@ -170,6 +196,20 @@
 <button id="btn-saglabat">Saglabāt</button>
   <button id="btn-atcelt">Atcelt</button>
   <p id="h-zinojums"></p>
+</dialog>
+
+<dialog id="sevi-logs">
+  <h3>Pievienot sevi</h3>
+  <input type="text" id="s-vards" placeholder="Vārds" maxlength="50"><br><br>
+  <input type="text" id="s-uzvards" placeholder="Uzvārds (nav obligāts)" maxlength="50"><br><br>
+  <input type="text" id="s-kontakti" placeholder="Kontaktinformācija (tālrunis vai e-pasts)" maxlength="150"><br><br>
+
+  <textarea id="s-apraksts" placeholder="Apraksts (kādu darbu meklē, kad vari strādāt, ko proti)" maxlength="500" rows="4" style="width: 100%;"></textarea><br>
+  <small class="sevi-padoms">Kartē izvēlies aptuvenu vietu (piem., savu rajonu), nevis precīzu mājas adresi.</small><br><br>
+
+  <button id="btn-s-saglabat">Saglabāt</button>
+  <button id="btn-s-atcelt">Atcelt</button>
+  <p id="s-zinojums"></p>
 </dialog>
 
 <dialog id="mani-logs">

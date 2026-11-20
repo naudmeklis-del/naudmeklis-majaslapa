@@ -996,3 +996,63 @@ label:has(.ampaksats-check) {
 }
 .favorita-karte:hover { box-shadow: 0 0 0 2px #cdb9e6; }
 .favorita-karte:focus-visible { outline: 3px solid #cbb8e8; }
+
+/* ===== DARBA MEKLĒTĀJI UN IZVĒLE "PIEVIENOT" ===== */
+
+/* Divi slēdži filtru panelī: "Rādīt darba piedāvājumus" / "Rādīt darba meklētājus" */
+.sledzi-grupa {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Darba meklētāja pin'š: tāda pati forma, citāda krāsa (cilvēka ikona vietā €) */
+.pins.pins-meklejs {
+  background: #7B3FBF;
+}
+
+/* Kontaktinformācija darba meklētāja kartītē */
+.popup-kontakti-rinda { align-items: flex-start; }
+.popup-kontakti-rinda .popup-ikona { margin-top: 2px; }
+.popup-kontakti {
+  font-weight: bold;
+  color: #3C1955;
+  word-break: break-word;
+}
+
+/* Izvēles logs "Pievienot": divas lielas pogas (logs jau pēc noklusējuma ir ekrāna centrā) */
+.izvele-pogas {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.izvele-pogas .izvele-poga {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 16px 18px;
+  background: #F3EAFB;
+  color: #3C1955;
+  border-radius: 12px;
+  text-align: left;
+}
+.izvele-pogas .izvele-poga:hover {
+  background: #E6D9F5;
+}
+.izvele-nosaukums {
+  font-size: 17px;
+  font-weight: bold;
+}
+.izvele-apraksts {
+  font-size: 14px;
+  font-weight: 400;
+  color: #6b5a80;
+}
+
+/* Neliels padoms zem formas "Pievienot sevi" */
+.sevi-padoms {
+  color: #6b5a80;
+  font-size: 13px;
+}
