@@ -26,11 +26,15 @@
   <!-- Augšējā josla -->
   <div class="josla">
     <img src="naudmeklislogoarsaukli.png" class="logo" alt="Naudmeklis">
-    <div>
+
+    <div class="josla-darbibas">
       <button id="btn-filtri" class="pievienot-btn filtri-btn">Filtri</button>
       <button id="btn-mani" style="display: none;" class="manisludinajumi-btn">Mans profils</button>
       <button id="btn-pievienot" style="display: none;" class="pievienot-btn">Pievienot</button>
-      <button id="btn-pieslegties" class="pieslegties-btn">Pieslēgties / Reģistrēties</button>
+    </div>
+
+    <div class="josla-konts">
+      <button id="btn-pieslegties" class="pieslegties-btn"><span class="txt-pilns">Pieslēgties / Reģistrēties</span><span class="txt-isais">Pieslēgties</span></button>
       <button id="btn-iziet" style="display: none;" class="iziet-btn">Iziet</button>
     </div>
   </div>
@@ -167,7 +171,7 @@
 
 <!-- Izvēle: ko pievienot (atveras, uzspiežot "Pievienot") -->
 <dialog id="pievienot-izvele-logs">
-  <h3 class="authdialog-title">Ko vēlies pievienot?</h3>
+  <h3 class="authdialog-title" tabindex="-1" autofocus>Ko vēlies pievienot?</h3>
   <div class="izvele-pogas">
     <button type="button" id="btn-izvele-haltura" class="izvele-poga">
       <span class="izvele-nosaukums">Pievienot haltūru</span>
@@ -184,7 +188,7 @@
 </dialog>
 
 <dialog id="haltura-logs">
-  <h3>Pievienot haltūru</h3>
+  <h3 tabindex="-1" autofocus>Pievienot haltūru</h3>
   <input type="text" id="h-nosaukums" placeholder="Nosaukums"><br><br>
   <select id="h-kategorija">
     <!-- Kategorijas tiek ielādētas no app.js (saraksts "kategorijas") -->
@@ -193,27 +197,31 @@
 
 <textarea id="h-apraksts" placeholder="Apraksts (kas jādara, kad, kur tieši, kontaktinformācija)" maxlength="500" rows="4" style="width: 100%;"></textarea><br><br>
 
-<button id="btn-saglabat">Saglabāt</button>
-  <button id="btn-atcelt">Atcelt</button>
+<div class="dialoga-pogas">
+    <button id="btn-saglabat">Saglabāt</button>
+    <button id="btn-atcelt">Atcelt</button>
+  </div>
   <p id="h-zinojums"></p>
 </dialog>
 
 <dialog id="sevi-logs">
-  <h3>Pievienot sevi</h3>
+  <h3 tabindex="-1" autofocus>Pievienot sevi</h3>
   <input type="text" id="s-vards" placeholder="Vārds" maxlength="50"><br><br>
   <input type="text" id="s-uzvards" placeholder="Uzvārds (nav obligāts)" maxlength="50"><br><br>
-  <input type="text" id="s-kontakti" placeholder="Kontaktinformācija (tālrunis vai e-pasts)" maxlength="150"><br><br>
+  <input type="text" id="s-kontakti" placeholder="Kontaktinformācija" maxlength="150"><br><br>
 
   <textarea id="s-apraksts" placeholder="Apraksts (kādu darbu meklē, kad vari strādāt, ko proti)" maxlength="500" rows="4" style="width: 100%;"></textarea><br>
-  <small class="sevi-padoms">Kartē izvēlies aptuvenu vietu (piem., savu rajonu), nevis precīzu mājas adresi.</small><br><br>
+  <small class="sevi-padoms">Kontaktinformācija: tālrunis vai e-pasts. Kartē izvēlies aptuvenu vietu (piem., savu rajonu), nevis precīzu mājas adresi.</small><br><br>
 
-  <button id="btn-s-saglabat">Saglabāt</button>
-  <button id="btn-s-atcelt">Atcelt</button>
+  <div class="dialoga-pogas">
+    <button id="btn-s-saglabat">Saglabāt</button>
+    <button id="btn-s-atcelt">Atcelt</button>
+  </div>
   <p id="s-zinojums"></p>
 </dialog>
 
 <dialog id="mani-logs">
-  <h3>Mans profils</h3>
+  <h3 tabindex="-1" autofocus>Mans profils</h3>
 
   <div class="profils-galva">
     <div class="profils-avatars" id="profils-avatars">?</div>
@@ -241,7 +249,7 @@
 </dialog>
 
 <dialog id="zinot-logs">
-  <h3>Ziņot par sludinājumu</h3>
+  <h3 tabindex="-1" autofocus>Ziņot par sludinājumu</h3>
   <select id="z-iemesls">
     <option>Krāpniecība</option>
     <option>Nepiemērots saturs</option>
@@ -250,8 +258,10 @@
     <option>Cits</option>
   </select><br><br>
   <textarea id="z-komentars" placeholder="Komentārs (nav obligāts)" maxlength="300" rows="3"></textarea><br><br>
-  <button id="btn-z-sutit">Nosūtīt</button>
-  <button id="btn-z-atcelt">Atcelt</button>
+  <div class="dialoga-pogas">
+    <button id="btn-z-sutit">Nosūtīt</button>
+    <button id="btn-z-atcelt">Atcelt</button>
+  </div>
   <p id="z-zinojums"></p>
 </dialog>
 

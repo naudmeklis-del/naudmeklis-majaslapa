@@ -660,12 +660,6 @@ dialog button:disabled {
   .logo {
     height: 32px;
   }
-  .josla > div {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    gap: 6px;
-  }
   .pieslegties-btn,
   .pievienot-btn,
   .manisludinajumi-btn,
@@ -1055,4 +1049,204 @@ label:has(.ampaksats-check) {
 .sevi-padoms {
   color: #6b5a80;
   font-size: 13px;
+}
+
+
+
+/* ============================================================
+   IZSKATS DATORĀ UN TELEFONĀ (kārtīgs, bez pārnesumiem)
+   ============================================================ */
+
+/* ----- Augšējā josla: logo pa kreisi, pogas pa labi ----- */
+.josla > .logo { margin-right: auto; }
+.josla-darbibas,
+.josla-konts {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.josla button { white-space: nowrap; }
+.txt-isais { display: none; }
+
+/* ----- Logi: nekad nepārsniedz ekrānu, ritinās, ja vajag ----- */
+dialog {
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+}
+dialog h3 {
+  margin: 0 0 14px;
+  color: #3C1955;
+  font-size: 22px;
+}
+dialog textarea { resize: vertical; }
+
+/* Saglabāt / Atcelt: vienā rindā, vienāda platuma */
+.dialoga-pogas {
+  display: flex;
+  gap: 8px;
+}
+.dialoga-pogas button { flex: 1; }
+
+/* Kļūdu paziņojumi zem formām (tukši tiek paslēpti) */
+#h-zinojums,
+#s-zinojums,
+#z-zinojums {
+  margin: 12px 0 0;
+  font-size: 14px;
+  color: #791414;
+}
+#h-zinojums:empty,
+#s-zinojums:empty,
+#z-zinojums:empty { display: none; }
+
+/* Rezultātu kartīte: katra rinda savā rindā */
+#f-rezultati {
+  white-space: pre-line;
+  line-height: 1.35;
+}
+
+/* Lauki profila sarakstā: vienmērīgas atstarpes */
+#mani-saraksts input,
+#mani-saraksts select,
+#mani-saraksts textarea { margin-bottom: 6px; }
+#mani-saraksts button { margin-top: 4px; }
+
+
+/* ===== TELEFONS un šaurs ekrāns (līdz 700px): josla divās kārtīgās rindās ===== */
+@media (max-width: 700px) {
+  .josla {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "logo    konts"
+      "darbibas darbibas";
+    align-items: center;
+    gap: 8px;
+    min-height: 0;
+    padding: 8px 10px 10px;
+  }
+  .josla > .logo {
+    grid-area: logo;
+    height: 30px;
+    margin: 0;
+  }
+  .josla > .josla-konts { grid-area: konts; }
+  .josla > .josla-darbibas { grid-area: darbibas; }
+
+  /* Īsāks teksts: "Pieslēgties / Reģistrēties" → "Pieslēgties" */
+  .txt-pilns { display: none; }
+  .txt-isais { display: inline; }
+
+  /* Rinda 2: pogas vienādi plašas un pa visu platumu */
+  .josla > .josla-darbibas button {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 40px;
+    padding: 8px 6px;
+    font-size: 14px;
+    border-radius: 10px;
+  }
+
+  /* Rinda 1 labajā pusē: konta pogas (viena no tām redzama) */
+  .josla > .josla-konts button {
+    min-height: 34px;
+    padding: 6px 14px;
+    font-size: 13px;
+    border: 2px solid #3C1955;
+    border-radius: 10px;
+    box-sizing: border-box;
+  }
+
+  /* Galvenā darbība ("Pievienot") izceļas, pārējās ir gaišākas */
+  #btn-filtri,
+  #btn-mani {
+    background: #F3EAFB;
+    color: #3C1955;
+  }
+  #btn-filtri:hover,
+  #btn-mani:hover { background: #E6D9F5; }
+
+  .filtri-panel { padding: 16px 14px; }
+  .filtri-virsraksts { font-size: 22px; }
+}
+
+
+/* ===== TELEFONS (līdz 600px): logi, cilnes, rezultātu kartīte ===== */
+@media (max-width: 600px) {
+
+  dialog {
+    width: calc(100vw - 24px);
+    max-height: calc(100dvh - 24px);
+    padding: 16px;
+  }
+  dialog h3,
+  .authdialog-title { font-size: 20px; }
+
+  /* Pietiekami lielas pogas, ko ērti nospiest ar pirkstu */
+  .dialoga-pogas button,
+  .auth-submit,
+  .btn-aizvert,
+  #btn-mani-aizvert,
+  #btn-izvele-atcelt {
+    min-height: 44px;
+    padding: 10px 14px;
+    font-size: 15px;
+    border-radius: 10px;
+  }
+  #btn-mani-aizvert { width: 100%; }
+  .izvele-pogas .izvele-poga {
+    padding: 14px 16px;
+    font-size: inherit;
+  }
+
+  /* Profils: cilnes bez teksta pārneses */
+  .profils-tabi .profils-tab {
+    padding: 10px 6px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  .profils-galva { padding: 10px; gap: 12px; }
+  .profils-avatars { width: 44px; height: 44px; font-size: 18px; }
+
+  /* Rezultātu kartīte kartes stūrī */
+  .rezultatu-karte {
+    left: 10px;
+    bottom: 24px;
+    gap: 10px;
+    max-width: calc(100% - 20px);
+    padding: 8px 14px 8px 8px;
+    font-size: 14px;
+  }
+  .rezultatu-ikona { width: 32px; height: 32px; }
+}
+
+
+/* ===== Fokuss: violets, nevis pārlūka melnais rāmis ===== */
+dialog h3:focus { outline: none; }
+dialog :focus-visible {
+  outline: 3px solid #cbb8e8;
+  outline-offset: 2px;
+}
+dialog input:focus,
+dialog select:focus,
+dialog textarea:focus {
+  outline: none;
+  border-color: #5b2a9e;
+  box-shadow: 0 0 0 3px #E6D9F5;
+}
+dialog input,
+dialog select,
+dialog textarea {
+  border: 1px solid #d9cde8;
+  border-radius: 10px;
+}
+
+/* ===== Kājene: saites nekad nelūst pa vidu un nepaliek viena "|" rindas sākumā ===== */
+.footer a { white-space: nowrap; }
+@media (max-width: 400px) {
+  .footer {
+    justify-content: space-around;
+    font-size: 12px;
+  }
+  .footer a + a::before { display: none; }   /* šaurā ekrānā svītriņas nav vajadzīgas */
 }
