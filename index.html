@@ -130,6 +130,7 @@
         <label for="login-parole">Parole</label>
         <input type="password" id="login-parole" autocomplete="current-password" placeholder="Tava parole">
       </div>
+      <p class="auth-aizmirsu"><button type="button" class="auth-saite" id="btn-aizmirsu-paroli">Aizmirsi paroli?</button></p>
       <p class="auth-zinojums" id="login-zinojums" role="alert"></p>
       <button type="submit" class="btn-login auth-submit" id="btn-login">Pieslēgties</button>
     </form>
@@ -162,6 +163,40 @@
       Jau ir konts?
       <button type="button" class="auth-saite" id="btn-uz-pieslegsanos">Pieslēgties</button>
     </p>
+  </section>
+
+  <!-- 3. skats: PAROLES ATJAUNOŠANA (parādās, kad uzspiež "Aizmirsi paroli?") -->
+  <section id="auth-reset-skats" hidden>
+    <h3 class="authdialog-title">Atjaunot paroli</h3>
+    <form id="reset-forma" novalidate>
+      <p class="auth-paskaidrojums">Ieraksti savu e-pastu, un mēs nosūtīsim saiti, ar kuru vari iestatīt jaunu paroli.</p>
+      <div class="auth-lauks">
+        <label for="reset-epasts">E-pasts</label>
+        <input type="email" id="reset-epasts" autocomplete="email" placeholder="piemers@epasts.lv">
+      </div>
+      <p class="auth-zinojums" id="reset-zinojums" role="alert"></p>
+      <button type="submit" class="btn-login auth-submit" id="btn-reset">Nosūtīt saiti</button>
+    </form>
+    <p class="auth-parslegt">
+      <button type="button" class="auth-saite" id="btn-reset-atpakal">Atpakaļ uz pieslēgšanos</button>
+    </p>
+  </section>
+
+  <!-- 4. skats: JAUNA PAROLE (atveras pats, kad lietotājs atver e-pastā saņemto saiti) -->
+  <section id="auth-newpass-skats" hidden>
+    <h3 class="authdialog-title">Jauna parole</h3>
+    <form id="newpass-forma" novalidate>
+      <div class="auth-lauks">
+        <label for="np-parole">Jaunā parole</label>
+        <input type="password" id="np-parole" autocomplete="new-password" placeholder="Vismaz 6 simboli">
+      </div>
+      <div class="auth-lauks">
+        <label for="np-parole2">Atkārto paroli</label>
+        <input type="password" id="np-parole2" autocomplete="new-password" placeholder="Ieraksti paroli vēlreiz">
+      </div>
+      <p class="auth-zinojums" id="np-zinojums" role="alert"></p>
+      <button type="submit" class="btn-login auth-submit" id="btn-newpass">Saglabāt paroli</button>
+    </form>
   </section>
 
   <div class="auth-aizvert-rinda">
@@ -248,6 +283,29 @@
   </div>
   <br>
   <button id="btn-mani-aizvert">Aizvērt</button>
+
+  <div class="profils-bistamais">
+    <button type="button" id="btn-dzest-kontu" class="dzest-kontu-btn">Dzēst kontu</button>
+  </div>
+</dialog>
+
+<!-- Konta dzēšanas apstiprinājums -->
+<dialog id="dzest-konta-logs">
+  <h3 tabindex="-1" autofocus>Dzēst kontu?</h3>
+  <p class="dzest-teksts">Tiks neatgriezeniski izdzēsts tavs konts un viss, kas ar to saistīts:</p>
+  <ul class="dzest-saraksts">
+    <li>visas tavas haltūras un darba meklētāja sludinājumi</li>
+    <li>tavi favorīti</li>
+  </ul>
+  <p class="dzest-teksts"><strong>Šo darbību nevar atsaukt.</strong></p>
+  <label class="dzest-apstiprinajums">
+    <input type="checkbox" id="dzest-checkbox"> Es saprotu, ka to nevar atsaukt
+  </label>
+  <p class="auth-zinojums" id="dzest-zinojums" role="alert"></p>
+  <div class="dialoga-pogas">
+    <button type="button" id="btn-dzest-apstiprinat" class="dzest-apstiprinat-btn" disabled>Dzēst kontu</button>
+    <button type="button" id="btn-dzest-atcelt">Atcelt</button>
+  </div>
 </dialog>
 
 <dialog id="zinot-logs">

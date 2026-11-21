@@ -534,6 +534,10 @@ var loginSkats        = document.getElementById('auth-login-skats');
 var registerSkats     = document.getElementById('auth-register-skats');
 var loginZinojums     = document.getElementById('login-zinojums');
 var registerZinojums  = document.getElementById('reg-zinojums');
+var resetSkats        = document.getElementById('auth-reset-skats');
+var newpassSkats      = document.getElementById('auth-newpass-skats');
+var resetZinojums     = document.getElementById('reset-zinojums');
+var newpassZinojums   = document.getElementById('np-zinojums');
 
 // ---------- Kļūdu tulkošana latviski ----------
 // Pieņem Supabase kļūdu un atgriež saprotamu tekstu latviešu valodā.
@@ -551,6 +555,9 @@ function latviskaKluda(kluda) {
   }
   if (kods === 'user_already_exists' || kods === 'email_exists' || teksts.indexOf('already registered') !== -1) {
     return 'Šis e-pasts jau tiek lietots. Mēģini pieslēgties.';
+  }
+  if (kods === 'same_password' || teksts.indexOf('different from the old') !== -1) {
+    return 'Jaunajai parolei jābūt citādai nekā vecajai.';
   }
   if (kods === 'weak_password' || teksts.indexOf('at least 6') !== -1 || teksts.indexOf('password should be') !== -1) {
     return 'Parole ir pārāk vāja. Tai jābūt vismaz 6 simbolus garai.';
@@ -608,12 +615,16 @@ function paradiZinojumu(elements, teksts, veids) {
   elements.className = 'auth-zinojums' + (veids === 'ok' ? ' ok' : veids === 'info' ? ' info' : '');
 }
 
-// Parāda vienu no diviem skatiem: 'login' vai 'register'
+// Parāda vienu no skatiem: 'login', 'register', 'reset' (aizmirsta parole) vai 'newpass' (jauna parole)
 function rutaAuthSkats(skats) {
   loginSkats.hidden    = (skats !== 'login');
   registerSkats.hidden = (skats !== 'register');
+  resetSkats.hidden    = (skats !== 'reset');
+  newpassSkats.hidden  = (skats !== 'newpass');
   paradiZinojumu(loginZinojums, '');
   paradiZinojumu(registerZinojums, '');
+  paradiZinojumu(resetZinojums, '');
+  paradiZinojumu(newpassZinojums, '');
 }
 
 // Atver logu. Pēc noklusējuma rāda pieslēgšanos.
@@ -622,7 +633,11 @@ function atvertAuth(skats, teksts) {
   skats = skats || 'login';
   rutaAuthSkats(skats);
   if (teksts) {
-    paradiZinojumu(skats === 'login' ? loginZinojums : registerZinojums, teksts, 'info');
+    var zinojumuVieta = {
+      login: loginZinojums, register: registerZinojums,
+      reset: resetZinojums, newpass: newpassZinojums
+    }[skats];
+    paradiZinojumu(zinojumuVieta, teksts, 'info');
   }
   if (!authLogs.open) authLogs.showModal();
 }
@@ -738,6 +753,97 @@ document.getElementById('register-forma').addEventListener('submit', async funct
     '. Uzspied to, tad pieslēdzies.', 'ok');
 });
 
+// ---------- Aizmirsta parole ----------
+// "Aizmirsi paroli?" atver e-pasta ievades skatu (e-pastu pārnes līdzi)
+document.getElementById('btn-aizmirsu-paroli').addEventListener('click', function () {
+  var epasts = document.getElementById('login-epasts').value;
+  rutaAuthSkats('reset');
+  document.getElementById('reset-epasts').value = epasts;
+});
+document.getElementById('btn-reset-atpakal').addEventListener('click', function () {
+  var epasts = document.getElementById('reset-epasts').value;
+  rutaAuthSkats('login');
+  document.getElementById('login-epasts').value = epasts;
+});
+
+// Nosūta e-pastu ar paroles atjaunošanas saiti
+document.getElementById('reset-forma').addEventListener('submit', async function (e) {
+  e.preventDefault();
+  var epasts = document.getElementById('reset-epasts').value.trim();
+
+  if (epasts === '')           { paradiZinojumu(resetZinojums, 'Ievadi e-pasta adresi.'); return; }
+  if (!epastsIrDerigs(epasts)) { paradiZinojumu(resetZinojums, 'E-pasta adrese nav derīga.'); return; }
+
+  var poga = document.getElementById('btn-reset');
+  poga.disabled = true;
+  poga.textContent = 'Uzgaidi...';
+  paradiZinojumu(resetZinojums, '');
+
+  // Uz kurieni atgriezties pēc saites uzspiešanas (šī lapa). Šai adresei jābūt arī Supabase
+  // sadaļā Authentication > URL Configuration > Redirect URLs.
+  var atgriesanasAdrese = window.location.origin + window.location.pathname.replace(/index\.html$/, '');
+
+  var rezultats;
+  try {
+    rezultats = await sb.auth.resetPasswordForEmail(epasts, { redirectTo: atgriesanasAdrese });
+  } catch (err) {
+    rezultats = { error: err };
+  }
+
+  if (rezultats.error) {
+    poga.disabled = false;
+    poga.textContent = 'Nosūtīt saiti';
+    paradiZinojumu(resetZinojums, latviskaKluda(rezultats.error));
+    return;
+  }
+
+  // Apzināti nesakām, vai šāds konts pastāv (lai citi nevarētu pārbaudīt svešus e-pastus)
+  paradiZinojumu(resetZinojums,
+    'Ja šāds konts pastāv, nosūtījām paroles atjaunošanas saiti uz ' + epasts +
+    '. Pārbaudi arī surogātpasta (spam) mapi.', 'ok');
+
+  // Nākamo e-pastu drīkst sūtīt tikai pēc minūtes
+  setTimeout(function () {
+    poga.disabled = false;
+    poga.textContent = 'Nosūtīt saiti';
+  }, 60000);
+});
+
+// Jaunas paroles saglabāšana (šis skats atveras pats, kad lietotājs atver saiti no e-pasta)
+document.getElementById('newpass-forma').addEventListener('submit', async function (e) {
+  e.preventDefault();
+  var forma   = e.target;
+  var parole  = document.getElementById('np-parole').value;
+  var parole2 = document.getElementById('np-parole2').value;
+
+  if (parole.length < 6)  { paradiZinojumu(newpassZinojums, 'Parolei jābūt vismaz 6 simbolus garai.'); return; }
+  if (parole !== parole2) { paradiZinojumu(newpassZinojums, 'Paroles nesakrīt.'); return; }
+
+  var poga = document.getElementById('btn-newpass');
+  poga.disabled = true;
+  poga.textContent = 'Uzgaidi...';
+  paradiZinojumu(newpassZinojums, '');
+
+  var rezultats;
+  try {
+    rezultats = await sb.auth.updateUser({ password: parole });
+  } catch (err) {
+    rezultats = { error: err };
+  }
+
+  poga.disabled = false;
+  poga.textContent = 'Saglabāt paroli';
+
+  if (rezultats.error) {
+    paradiZinojumu(newpassZinojums, latviskaKluda(rezultats.error));
+    return;
+  }
+
+  forma.reset();
+  authLogs.close();
+  paradiPazinojumu('✓ Parole nomainīta!');
+});
+
 document.getElementById('btn-iziet').addEventListener('click', async function () {
   await sb.auth.signOut();
 });
@@ -748,6 +854,11 @@ var pedejaisPieslegts = null;   // lai zinātu, vai pieslēgšanās stāvoklis t
 sb.auth.onAuthStateChange(function (notikums, sesija) {
   var pieslegts = sesija !== null;
   manaLietotajaId = pieslegts ? sesija.user.id : null;
+
+  // Lietotājs atvēra paroles atjaunošanas saiti no e-pasta: parādām jaunas paroles logu
+  if (notikums === 'PASSWORD_RECOVERY') {
+    setTimeout(function () { atvertAuth('newpass'); }, 0);
+  }
   if (visasHalturas.length > 0 || visiMeklejie.length > 0) pielietotFiltrus();   // pārzīmē pin'us, lai savi sludinājumi iegūtu dzelteno apmali
 
   // Kontakti ir redzami tikai pieslēgtiem, tāpēc pieslēdzoties vai izejot sludinājumus ielādē no jauna
@@ -1643,4 +1754,64 @@ document.getElementById('tab-sludinajumi').addEventListener('click', function ()
 });
 document.getElementById('tab-favoriti').addEventListener('click', function () {
   rodiProfilaTabu('favoriti');
+});
+
+
+// ========== 12. KONTA DZĒŠANA ==========
+
+var dzestKontaLogs  = document.getElementById('dzest-konta-logs');
+var dzestCheckbox   = document.getElementById('dzest-checkbox');
+var dzestPoga       = document.getElementById('btn-dzest-apstiprinat');
+var dzestZinojums   = document.getElementById('dzest-zinojums');
+
+// "Dzēst kontu" profilā: aizver profilu un atver apstiprinājuma logu
+document.getElementById('btn-dzest-kontu').addEventListener('click', function () {
+  maniLogs.close();
+  dzestCheckbox.checked = false;
+  dzestPoga.disabled = true;
+  paradiZinojumu(dzestZinojums, '');
+  dzestKontaLogs.showModal();
+});
+
+// Dzēšanas poga ieslēdzas tikai tad, kad atzīmēts "Es saprotu..."
+dzestCheckbox.addEventListener('change', function () {
+  dzestPoga.disabled = !dzestCheckbox.checked;
+});
+
+document.getElementById('btn-dzest-atcelt').addEventListener('click', function () {
+  dzestKontaLogs.close();
+});
+
+dzestPoga.addEventListener('click', async function () {
+  dzestPoga.disabled = true;
+  dzestPoga.textContent = 'Dzēšu...';
+  paradiZinojumu(dzestZinojums, '');
+
+  // Datubāzes funkcija "dzest_manu_kontu" (sk. failu supabase-konta-dzesana.sql)
+  // izdzēš lietotāja sludinājumus, favorītus un pašu kontu
+  var rezultats;
+  try {
+    rezultats = await sb.rpc('dzest_manu_kontu');
+  } catch (err) {
+    rezultats = { error: err };
+  }
+
+  dzestPoga.textContent = 'Dzēst kontu';
+
+  if (rezultats.error) {
+    dzestPoga.disabled = false;
+    paradiZinojumu(dzestZinojums, latviskaKluda(rezultats.error));
+    return;
+  }
+
+  // Konts vairs neeksistē: notīra sesiju šajā pārlūkā
+  try {
+    await sb.auth.signOut({ scope: 'local' });
+  } catch (err) {
+    console.error('Izrakstīšanās pēc konta dzēšanas:', err);
+  }
+
+  dzestKontaLogs.close();
+  ieladetPinus();
+  paradiPazinojumu('Tavs konts ir izdzēsts.', 4000);
 });

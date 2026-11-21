@@ -646,6 +646,55 @@ dialog button:disabled {
 }
 
 
+/* ===== Aizmirsta parole un konta dzēšana ===== */
+.auth-aizmirsu {
+  margin: -4px 0 10px;
+  text-align: right;
+  font-size: 14px;
+}
+.auth-aizmirsu .auth-saite { font-size: 14px; }
+
+.auth-paskaidrojums {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: #444;
+}
+
+/* "Dzēst kontu" profila apakšā: maza, nepiesaista uzmanību */
+.profils-bistamais {
+  margin-top: 18px;
+  padding-top: 12px;
+  border-top: 1px solid #efe7f6;
+  text-align: center;
+}
+.dzest-kontu-btn {
+  background: none;
+  color: #8f1d1d;
+  border: 1px solid #8f1d1d;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 14px;
+}
+dialog button.dzest-kontu-btn:hover {
+  background: #8f1d1d;
+  color: #fff;
+}
+
+/* Konta dzēšanas apstiprinājuma logs */
+#dzest-konta-logs .dzest-teksts { margin: 0 0 8px; font-size: 15px; }
+#dzest-konta-logs .dzest-saraksts { margin: 0 0 12px; padding-left: 20px; font-size: 15px; }
+#dzest-konta-logs .dzest-apstiprinajums {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0;
+  font-size: 15px;
+  cursor: pointer;
+}
+dialog button.dzest-apstiprinat-btn { background: #8f1d1d; }
+dialog button.dzest-apstiprinat-btn:hover { background: #6e1414; }
+dialog button.dzest-apstiprinat-btn:disabled { background: #8f1d1d; }
+
 /* ===== TELEFONS: mazākas pogas =====
    Šim blokam jābūt faila BEIGĀS, lai tas pārraksta iepriekšējos izmērus.
    Ja pogas vēl joprojām šķiet par lielām, samazini skaitļus "padding" un "font-size". */
