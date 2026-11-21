@@ -1030,6 +1030,26 @@ label:has(.ampaksats-check) {
   word-break: break-word;
 }
 
+/* Klikšķināma kontaktinformācija (tālrunis / e-pasts) */
+.popup-kontakti a {
+  color: #3C1955;
+  text-decoration: underline;
+}
+
+/* Poga "Pieslēdzies, lai redzētu kontaktus" */
+.kontakti-slegti {
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  color: #5b2a9e;
+  font: inherit;
+  font-weight: bold;
+  text-align: left;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 /* Izvēles logs "Pievienot": divas lielas pogas (logs jau pēc noklusējuma ir ekrāna centrā) */
 .izvele-pogas {
   display: flex;

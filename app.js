@@ -94,16 +94,75 @@ var IKONA_TALRUNIS = '<svg class="popup-ikona" viewBox="0 0 24 24" aria-hidden="
 var IKONA_EPASTS = '<svg class="popup-ikona" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>';
 var IKONA_LAIKS = '<svg class="popup-ikona" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
 
-// Kontaktinformācijas rinda: ja tekstā ir e-pasts, rāda e-pasta ikonu, citādi tālruņa ikonu.
-// To izmanto gan haltūru, gan darba meklētāju kartītēs.
+// Kontaktinformācijas veids: 'epasts', 'talrunis' vai null (nav derīgs).
+// Tālrunis: neobligāts +, pēc tā 8-15 cipari (atstarpes, domuzīmes un iekavas drīkst).
+function kontaktaVeids(teksts) {
+  teksts = (teksts || '').trim();
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(teksts)) return 'epasts';
+  if (/^\+?[\d\s\-()]+$/.test(teksts)) {
+    var cipari = teksts.replace(/\D/g, '').length;
+    if (cipari >= 8 && cipari <= 15) return 'talrunis';
+  }
+  return null;
+}
+var KONTAKTU_KLUDA = 'Kontaktinformācijai jābūt derīgam tālruņa numuram vai e-pasta adresei.';
+
+// Kontaktinformācijas rinda: e-pastam e-pasta ikona un mailto: saite,
+// tālrunim tālruņa ikona un tel: saite. To izmanto gan haltūru, gan darba meklētāju kartītēs.
 function izveidotKontaktuRindu(kontakti) {
-  var irEpasts = /\S+@\S+\.\S+/.test(kontakti);
+  kontakti = kontakti.trim();
+  var veids = kontaktaVeids(kontakti);
+
+  // Vecākiem ierakstiem teksts var būt brīvs: tad ikonu izvēlas pēc tā, vai tekstā ir e-pasts
+  var irEpasts = veids ? (veids === 'epasts') : /\S+@\S+\.\S+/.test(kontakti);
 
   var rinda = document.createElement('div');
   rinda.className = 'popup-rinda popup-kontakti-rinda';
   rinda.innerHTML = (irEpasts ? IKONA_EPASTS : IKONA_TALRUNIS) + '<span class="popup-kontakti"></span>';
-  rinda.querySelector('.popup-kontakti').textContent = kontakti;
+  var vieta = rinda.querySelector('.popup-kontakti');
+
+  if (veids) {
+    var saite = document.createElement('a');
+    saite.textContent = kontakti;
+    if (veids === 'epasts') {
+      saite.href = 'mailto:' + kontakti;
+    } else {
+      saite.href = 'tel:' + (kontakti.charAt(0) === '+' ? '+' : '') + kontakti.replace(/\D/g, '');
+    }
+    // Lai klikšķis uz saites neatver favorītu kartīti
+    saite.addEventListener('click', function (e) { e.stopPropagation(); });
+    vieta.appendChild(saite);
+  } else {
+    vieta.textContent = kontakti;
+  }
   return rinda;
+}
+
+// Kontaktu vieta kartītē. Ja nepieslēdzies, datubāze kontaktus neatdod vispār
+// (contact ir undefined), un tad rādām pogu "Pieslēdzies, lai redzētu kontaktus".
+// Ja kontaktu nav (vecs sludinājums), nerāda neko.
+var IKONA_SLEDZENE = '<svg class="popup-ikona" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+
+function izveidotKontaktuVietu(kontakti) {
+  if (kontakti === undefined) {
+    var rinda = document.createElement('div');
+    rinda.className = 'popup-rinda';
+    rinda.innerHTML = IKONA_SLEDZENE;
+
+    var poga = document.createElement('button');
+    poga.type = 'button';
+    poga.className = 'kontakti-slegti';
+    poga.textContent = 'Pieslēdzies, lai redzētu kontaktus';
+    poga.addEventListener('click', function (e) {
+      e.stopPropagation();
+      karte.closePopup();
+      atvertAuth('login', 'Lai redzētu kontaktus, jāpieslēdzas.');
+    });
+    rinda.appendChild(poga);
+    return rinda;
+  }
+  if (!kontakti) return null;
+  return izveidotKontaktuRindu(kontakti);
 }
 
 // Attālums līdz lietotājam kā teksts ("1,2 km no tevis"); tukšs, ja vieta nav zināma
@@ -196,9 +255,8 @@ function izveidotKartiti(h, ipasibas) {
   }
 
   // 5. Kontaktinformācija (vecākiem sludinājumiem tās var nebūt)
-  if (h.contact) {
-    sakne.appendChild(izveidotKontaktuRindu(h.contact));
-  }
+  var kontaktuEl = izveidotKontaktuVietu(h.contact);
+  if (kontaktuEl) sakne.appendChild(kontaktuEl);
 
   // 6. Apakšējā rinda: laiks kreisajā pusē, "Ziņot" labajā pusē
   var apaksa = document.createElement('div');
@@ -219,7 +277,7 @@ function izveidotKartiti(h, ipasibas) {
     btnZinot.className = 'zinot-btn';
     btnZinot.textContent = '⚑ Ziņot';
     btnZinot.addEventListener('click', function () {
-      atvertZinosanu(h.id);
+      atvertZinosanu(h.id, 'haltura');
     });
     apaksa.appendChild(btnZinot);
   }
@@ -260,7 +318,7 @@ function pievienotPinu(h) {
 }
 
 
-// Darba meklētāja kartīte (bez zvaigznītes un "Ziņot": tās darbojas tikai haltūrām)
+// Darba meklētāja kartīte (bez zvaigznītes: favorīti darbojas tikai haltūrām)
 function izveidotMeklejaKartiti(m) {
   var sakne = document.createElement('div');
   sakne.className = 'popup-karte';
@@ -293,7 +351,8 @@ function izveidotMeklejaKartiti(m) {
   }
 
   // 5. Kontaktinformācija
-  sakne.appendChild(izveidotKontaktuRindu(m.contact));
+  var kontaktuEl = izveidotKontaktuVietu(m.contact);
+  if (kontaktuEl) sakne.appendChild(kontaktuEl);
 
   // 6. Laiks
   var apaksa = document.createElement('div');
@@ -306,6 +365,15 @@ function izveidotMeklejaKartiti(m) {
     laiksEl.querySelector('.popup-laiks').textContent = laiksTeksts;
   }
   apaksa.appendChild(laiksEl);
+
+  var btnZinot = document.createElement('button');
+  btnZinot.type = 'button';
+  btnZinot.className = 'zinot-btn';
+  btnZinot.textContent = '⚑ Ziņot';
+  btnZinot.addEventListener('click', function () {
+    atvertZinosanu(m.id, 'meklejs');
+  });
+  apaksa.appendChild(btnZinot);
   sakne.appendChild(apaksa);
 
   return {
@@ -338,12 +406,27 @@ function pievienotMeklejaPinu(m) {
 
 // ========== 4. DATU IELASĪŠANA UN FILTRI ==========
 
+// Kolonnas, ko drīkst redzēt arī nepieslēgušies lietotāji (BEZ kontaktiem).
+// Pieslēgušies lietotāji ielādē visu ("*"). Tām pašām kolonnām jābūt atļautām Supabase SQL.
+var GIGS_PUBLISKIE = 'id,title,category,price,description,lat,lon,user_id,created_at,expires_at,hidden';
+var SEEKERS_PUBLISKIE = 'id,first_name,last_name,description,lat,lon,user_id,created_at,expires_at,hidden';
+var ieladesNumurs = 0;           // lai vecāka (lēnāka) ielāde nepārraksta jaunāko
+
 var visasHalturas = [];          // visas ielasītās haltūras
 var visiMeklejie = [];           // visi ielasītie darba meklētāji
 var izveletasKategorijas = [];   // kategorijas, ko lietotājs atzīmējis
 
 async function ieladetPinus() {
-  var rezultats = await sb.from('gigs').select('*').eq('hidden', false);
+  var ielade = ++ieladesNumurs;
+
+  // Pieslēgtie redz arī kontaktus, nepieslēgtie ne
+  var sesijaPinam = await sb.auth.getSession();
+  var pieslegtsPinam = !!sesijaPinam.data.session;
+
+  var rezultats = await sb.from('gigs')
+    .select(pieslegtsPinam ? '*' : GIGS_PUBLISKIE)
+    .eq('hidden', false);
+  if (ielade !== ieladesNumurs) return;   // starplaikā sākusies jaunāka ielāde
 
   if (rezultats.error) {
     console.error('Kļūda:', rezultats.error.message);
@@ -355,7 +438,11 @@ async function ieladetPinus() {
   visasHalturas = rezultats.data;   // iegaumējam visu sarakstu
 
   // Darba meklētāji. Ja kaut kas noiet greizi, haltūras tāpat tiek rādītas.
-  var meklejuRez = await sb.from('seekers').select('*').eq('hidden', false);
+  var meklejuRez = await sb.from('seekers')
+    .select(pieslegtsPinam ? '*' : SEEKERS_PUBLISKIE)
+    .eq('hidden', false);
+  if (ielade !== ieladesNumurs) return;
+
   if (meklejuRez.error) {
     console.error('Darba meklētāji:', meklejuRez.error.message);
     visiMeklejie = [];
@@ -656,10 +743,17 @@ document.getElementById('btn-iziet').addEventListener('click', async function ()
 });
 
 // Seko, vai lietotājs ir pieslēdzies, un parāda pareizās pogas
+var pedejaisPieslegts = null;   // lai zinātu, vai pieslēgšanās stāvoklis tiešām mainījies
+
 sb.auth.onAuthStateChange(function (notikums, sesija) {
   var pieslegts = sesija !== null;
   manaLietotajaId = pieslegts ? sesija.user.id : null;
   if (visasHalturas.length > 0 || visiMeklejie.length > 0) pielietotFiltrus();   // pārzīmē pin'us, lai savi sludinājumi iegūtu dzelteno apmali
+
+  // Kontakti ir redzami tikai pieslēgtiem, tāpēc pieslēdzoties vai izejot sludinājumus ielādē no jauna
+  // (setTimeout, lai neizsauktu Supabase tieši šajā funkcijā)
+  if (pedejaisPieslegts !== null && pedejaisPieslegts !== pieslegts) setTimeout(ieladetPinus, 0);
+  pedejaisPieslegts = pieslegts;
   document.getElementById('btn-pieslegties').style.display = pieslegts ? 'none' : 'inline-block';
   document.getElementById('btn-iziet').style.display = pieslegts ? 'inline-block' : 'none';
   document.getElementById('btn-mani').style.display = pieslegts ? 'inline-block' : 'none';
@@ -798,6 +892,10 @@ document.getElementById('btn-saglabat').addEventListener('click', async function
     hZinojums.textContent = 'Ieraksti kontaktinformāciju (tālruni vai e-pastu).';
     return;
   }
+  if (!kontaktaVeids(kontakti)) {
+    hZinojums.textContent = KONTAKTU_KLUDA;
+    return;
+  }
 
   var sesija = await sb.auth.getSession();
   var lietotajs = sesija.data.session.user;
@@ -854,7 +952,11 @@ document.getElementById('btn-s-saglabat').addEventListener('click', async functi
     return;
   }
   if (kontakti === '') {
-    sZinojums.textContent = 'Ieraksti kontaktinformāciju.';
+    sZinojums.textContent = 'Ieraksti kontaktinformāciju (tālruni vai e-pastu).';
+    return;
+  }
+  if (!kontaktaVeids(kontakti)) {
+    sZinojums.textContent = KONTAKTU_KLUDA;
     return;
   }
   if (apraksts === '') {
@@ -1040,6 +1142,10 @@ function izveidotRindu(h) {
       alert('Kontaktinformācija ir obligāta.');
       return;
     }
+    if (!kontaktaVeids(kontaktiLauks.value)) {
+      alert(KONTAKTU_KLUDA);
+      return;
+    }
 
     var r = await sb.from('gigs').update({
       title: nosaukumsLauks.value.trim(),
@@ -1121,6 +1227,10 @@ function izveidotMeklejaRindu(m) {
     if (vardsLauks.value.trim() === '' || kontaktiLauks.value.trim() === '' ||
         aprakstsLauks.value.trim() === '') {
       alert('Vārds, kontaktinformācija un apraksts ir obligāti.');
+      return;
+    }
+    if (!kontaktaVeids(kontaktiLauks.value)) {
+      alert(KONTAKTU_KLUDA);
       return;
     }
 
@@ -1324,6 +1434,7 @@ karte.locate({ setView: true, maxZoom: 15 });
 var zinotLogs = document.getElementById('zinot-logs');
 var zZinojums = document.getElementById('z-zinojums');
 var zinojamaisId = null;   // sludinājums, par kuru šobrīd ziņo
+var zinojamaisVeids = 'haltura';   // 'haltura' vai 'meklejs'
 
 // Pārlūka "ierīces ID": nejaušs teksts, kas saglabājas šajā pārlūkā.
 // Tas palīdz atšķirt dažādas ierīces (pilnībā neuzticams, tāpēc lietojam kopā ar IP un kontu).
@@ -1342,7 +1453,7 @@ function iegutIericesId() {
   }
 }
 
-async function atvertZinosanu(id) {
+async function atvertZinosanu(id, veids) {
   var sesija = await sb.auth.getSession();
 
   if (!sesija.data.session) {
@@ -1351,6 +1462,7 @@ async function atvertZinosanu(id) {
   }
 
   zinojamaisId = id;
+  zinojamaisVeids = veids || 'haltura';
   zZinojums.textContent = '';
   document.getElementById('z-komentars').value = '';
   zinotLogs.showModal();
@@ -1364,12 +1476,22 @@ document.getElementById('btn-z-sutit').addEventListener('click', async function 
   var iemesls = document.getElementById('z-iemesls').value;
   var komentars = document.getElementById('z-komentars').value.trim();
 
-  var rezultats = await sb.from('reports').insert({
-    gig_id: zinojamaisId,
+  var dati = {
     reason: iemesls,
     comment: komentars === '' ? null : komentars,
     device_id: iegutIericesId()
-  });
+  };
+  // Par haltūrām ziņojumi iet tabulā "reports", par darba meklētājiem tabulā "seeker_reports"
+  var tabula;
+  if (zinojamaisVeids === 'meklejs') {
+    tabula = 'seeker_reports';
+    dati.seeker_id = zinojamaisId;
+  } else {
+    tabula = 'reports';
+    dati.gig_id = zinojamaisId;
+  }
+
+  var rezultats = await sb.from(tabula).insert(dati);
 
   if (rezultats.error) {
     if (rezultats.error.code === '23505') {
