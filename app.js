@@ -90,7 +90,21 @@ function formatetLaiku(isoTeksts) {
 
 // Mazas līniju ikonas sludinājuma logam
 var IKONA_VIETA = '<svg class="popup-ikona" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
+var IKONA_TALRUNIS = '<svg class="popup-ikona" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
+var IKONA_EPASTS = '<svg class="popup-ikona" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>';
 var IKONA_LAIKS = '<svg class="popup-ikona" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+
+// Kontaktinformācijas rinda: ja tekstā ir e-pasts, rāda e-pasta ikonu, citādi tālruņa ikonu.
+// To izmanto gan haltūru, gan darba meklētāju kartītēs.
+function izveidotKontaktuRindu(kontakti) {
+  var irEpasts = /\S+@\S+\.\S+/.test(kontakti);
+
+  var rinda = document.createElement('div');
+  rinda.className = 'popup-rinda popup-kontakti-rinda';
+  rinda.innerHTML = (irEpasts ? IKONA_EPASTS : IKONA_TALRUNIS) + '<span class="popup-kontakti"></span>';
+  rinda.querySelector('.popup-kontakti').textContent = kontakti;
+  return rinda;
+}
 
 // Attālums līdz lietotājam kā teksts ("1,2 km no tevis"); tukšs, ja vieta nav zināma
 function attalumaTeksts(platums, garums) {
@@ -144,7 +158,10 @@ function izveidotKartiti(h, ipasibas) {
   galva.appendChild(zvaigzne);
   sakne.appendChild(galva);
 
-  // 2. Cena violetā zīmītē
+  // 2. Cena (violeta zīmīte) un kategorija (gaiša zīmīte)
+  var zimes = document.createElement('div');
+  zimes.className = 'popup-zimes';
+
   var cenaZime = document.createElement('div');
   cenaZime.className = 'popup-cena';
   if (h.price === null || h.price === undefined || h.price === '') {
@@ -153,7 +170,15 @@ function izveidotKartiti(h, ipasibas) {
     var c = Number(h.price);
     cenaZime.textContent = '€' + (Number.isInteger(c) ? c : c.toFixed(2));
   }
-  sakne.appendChild(cenaZime);
+  zimes.appendChild(cenaZime);
+
+  if (h.category) {
+    var kategorijaZime = document.createElement('div');
+    kategorijaZime.className = 'popup-kategorija';
+    kategorijaZime.textContent = h.category;
+    zimes.appendChild(kategorijaZime);
+  }
+  sakne.appendChild(zimes);
 
   // 3. Attālums no lietotāja (rādās tikai, ja atrašanās vieta ir noteikta)
   var attalumaRinda = document.createElement('div');
@@ -170,7 +195,12 @@ function izveidotKartiti(h, ipasibas) {
     sakne.appendChild(aprakstsEl);
   }
 
-  // 5. Apakšējā rinda: laiks kreisajā pusē, "Ziņot" labajā pusē
+  // 5. Kontaktinformācija (vecākiem sludinājumiem tās var nebūt)
+  if (h.contact) {
+    sakne.appendChild(izveidotKontaktuRindu(h.contact));
+  }
+
+  // 6. Apakšējā rinda: laiks kreisajā pusē, "Ziņot" labajā pusē
   var apaksa = document.createElement('div');
   apaksa.className = 'popup-apakseja';
 
@@ -231,8 +261,6 @@ function pievienotPinu(h) {
 
 
 // Darba meklētāja kartīte (bez zvaigznītes un "Ziņot": tās darbojas tikai haltūrām)
-var IKONA_TALRUNIS = '<svg class="popup-ikona" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
-
 function izveidotMeklejaKartiti(m) {
   var sakne = document.createElement('div');
   sakne.className = 'popup-karte';
@@ -265,11 +293,7 @@ function izveidotMeklejaKartiti(m) {
   }
 
   // 5. Kontaktinformācija
-  var kontaktuRinda = document.createElement('div');
-  kontaktuRinda.className = 'popup-rinda popup-kontakti-rinda';
-  kontaktuRinda.innerHTML = IKONA_TALRUNIS + '<span class="popup-kontakti"></span>';
-  kontaktuRinda.querySelector('.popup-kontakti').textContent = m.contact;
-  sakne.appendChild(kontaktuRinda);
+  sakne.appendChild(izveidotKontaktuRindu(m.contact));
 
   // 6. Laiks
   var apaksa = document.createElement('div');
@@ -763,10 +787,15 @@ document.getElementById('btn-saglabat').addEventListener('click', async function
   var nosaukums = document.getElementById('h-nosaukums').value.trim();
   var kategorija = document.getElementById('h-kategorija').value;
   var cena = document.getElementById('h-cena').value;
+  var kontakti = document.getElementById('h-kontakti').value.trim();
   var apraksts = document.getElementById('h-apraksts').value.trim();
 
   if (nosaukums === '') {
     hZinojums.textContent = 'Ieraksti nosaukumu.';
+    return;
+  }
+  if (kontakti === '') {
+    hZinojums.textContent = 'Ieraksti kontaktinformāciju (tālruni vai e-pastu).';
     return;
   }
 
@@ -777,6 +806,7 @@ document.getElementById('btn-saglabat').addEventListener('click', async function
     title: nosaukums,
     category: kategorija,
     price: cena === '' ? null : Number(cena),
+    contact: kontakti,
     description: apraksts === '' ? null : apraksts,
     lat: izveletaVieta.lat,
     lon: izveletaVieta.lng,
@@ -800,6 +830,7 @@ document.getElementById('btn-saglabat').addEventListener('click', async function
 
   document.getElementById('h-nosaukums').value = '';
   document.getElementById('h-cena').value = '';
+  document.getElementById('h-kontakti').value = '';
   document.getElementById('h-apraksts').value = '';
   halturaLogs.close();
   paradiPazinojumu('✓ Sludinājums veiksmīgi pievienots!');
@@ -990,6 +1021,12 @@ function izveidotRindu(h) {
   cenaLauks.value = h.price;
   cenaLauks.style.width = '70px';
 
+  var kontaktiLauks = document.createElement('input');
+  kontaktiLauks.value = h.contact || '';
+  kontaktiLauks.placeholder = 'Kontaktinformācija (tālrunis vai e-pasts)';
+  kontaktiLauks.maxLength = 150;
+  kontaktiLauks.style.width = '100%';
+
   var aprakstsLauks = document.createElement('textarea');
   aprakstsLauks.value = h.description || '';
   aprakstsLauks.rows = 3;
@@ -999,10 +1036,16 @@ function izveidotRindu(h) {
   var btnSaglabat = document.createElement('button');
   btnSaglabat.textContent = 'Saglabāt';
   btnSaglabat.addEventListener('click', async function () {
+    if (kontaktiLauks.value.trim() === '') {
+      alert('Kontaktinformācija ir obligāta.');
+      return;
+    }
+
     var r = await sb.from('gigs').update({
       title: nosaukumsLauks.value.trim(),
       category: kategorijaLauks.value,
       price: cenaLauks.value === '' ? null : Number(cenaLauks.value),
+      contact: kontaktiLauks.value.trim(),
       description: aprakstsLauks.value.trim() || null
     }).eq('id', h.id);
 
@@ -1031,6 +1074,7 @@ function izveidotRindu(h) {
 
   rinda.append(info, document.createElement('br'),
     nosaukumsLauks, ' ', kategorijaLauks, ' ', cenaLauks, ' €',
+    document.createElement('br'), kontaktiLauks,
     document.createElement('br'), aprakstsLauks,
     document.createElement('br'), btnSaglabat, ' ', btnDzest);
 

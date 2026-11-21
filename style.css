@@ -875,6 +875,22 @@ label:has(.ampaksats-check) {
   font-weight: bold;
 }
 
+/* Cena un kategorija vienā rindā */
+.popup-zimes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-self: flex-start;
+}
+.popup-karte .popup-kategorija {
+  padding: 4px 12px;
+  background: #efe7f6;
+  color: #3C1955;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: bold;
+}
+
 /* Rinda ar ikonu (attālums, laiks) */
 .popup-rinda {
   display: flex;
