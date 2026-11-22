@@ -4,6 +4,11 @@ var SUPABASE_URL = 'https://skyfwmjjchvjnudhrjea.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_5l6XZiifoA22UkH9cHz54Q_pKs5kHbQ';
 var sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// Vai lapa atvērta no e-pastā saņemtās saites? Jāpaņem uzreiz, kamēr Supabase vēl nav notīrījis adresi.
+var adresesDala = window.location.hash + window.location.search;
+var epastsApstiprinats = /[#&?]type=signup/.test(adresesDala);
+var saiteNederiga = /error_code=otp_expired|error=access_denied/.test(adresesDala);
+
 
 // ========== 2. KARTE ==========
 
@@ -848,6 +853,11 @@ document.getElementById('btn-iziet').addEventListener('click', async function ()
   await sb.auth.signOut();
 });
 
+// Ja e-pasta saite ir novecojusi vai jau izmantota
+if (saiteNederiga) {
+  setTimeout(function () { paradiPazinojumu('Saite ir novecojusi vai jau izmantota. Mēģini vēlreiz.', 5000); }, 600);
+}
+
 // Seko, vai lietotājs ir pieslēdzies, un parāda pareizās pogas
 var pedejaisPieslegts = null;   // lai zinātu, vai pieslēgšanās stāvoklis tiešām mainījies
 
@@ -858,6 +868,12 @@ sb.auth.onAuthStateChange(function (notikums, sesija) {
   // Lietotājs atvēra paroles atjaunošanas saiti no e-pasta: parādām jaunas paroles logu
   if (notikums === 'PASSWORD_RECOVERY') {
     setTimeout(function () { atvertAuth('newpass'); }, 0);
+  }
+
+  // Lietotājs uzspieda apstiprinājuma saiti e-pastā: parādām paziņojumu ekrāna vidū (tikai vienreiz)
+  if (notikums === 'SIGNED_IN' && epastsApstiprinats) {
+    epastsApstiprinats = false;
+    setTimeout(function () { paradiPazinojumu('✓ E-pasts apstiprināts! Tu esi pieslēdzies.', 4000); }, 0);
   }
   if (visasHalturas.length > 0 || visiMeklejie.length > 0) pielietotFiltrus();   // pārzīmē pin'us, lai savi sludinājumi iegūtu dzelteno apmali
 
