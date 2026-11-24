@@ -1352,3 +1352,10 @@ dialog textarea {
   height: 18px;
 }
 .filtri-panel .ampaksats-check:checked::before { transform: translateX(20px); }
+
+/* ===== Larger logo on desktop only ===== */
+@media (min-width: 900px) {
+  .logo {
+    height: 70px;   /* was 45px */
+  }
+}
