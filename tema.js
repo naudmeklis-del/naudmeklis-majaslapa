@@ -23,6 +23,8 @@
     var poga = document.getElementById('btn-tema');
     if (!poga) return;
 
+    var taimeris;   // laiks, pēc kura noņem pārejas klasi
+
     function irTumsa() {
       return saknes.getAttribute('data-theme') === 'dark';
     }
@@ -36,6 +38,13 @@
     atjaunotPogu();
 
     poga.addEventListener('click', function () {
+      // uz brīdi ieslēdzam mīkstās krāsu pārejas (skat. style.css, "tema-pariet")
+      saknes.classList.add('tema-pariet');
+      clearTimeout(taimeris);
+      taimeris = setTimeout(function () {
+        saknes.classList.remove('tema-pariet');
+      }, 450);
+
       var jaunaIzvele = irTumsa() ? 'light' : 'dark';
       if (jaunaIzvele === 'dark') {
         saknes.setAttribute('data-theme', 'dark');
