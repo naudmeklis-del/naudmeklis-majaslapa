@@ -1390,3 +1390,22 @@ dialog textarea {
   background: #f7f8f8;
   color: #3c4043;
 }
+.google-btn,
+.facebook-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #fff;
+  color: #3c4043;
+  border: 1px solid #dadce0;
+}
+.google-btn:hover,
+.facebook-btn:hover {
+  background: #f7f8f8;
+  color: #3c4043;
+}
+.google-btn + .facebook-btn {
+  margin-top: 8px;
+}
