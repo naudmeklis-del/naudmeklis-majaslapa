@@ -1812,3 +1812,59 @@ html[data-theme="dark"] .footer {
 }
 html[data-theme="dark"] .footer a { color: #E6D9F5; }
 html[data-theme="dark"] .footer a + a::before { color: #7C5A9A; }
+
+
+/* ============================================================
+   GLUDAS KRĀSU PĀREJAS
+   Tāpat kā kategoriju pogām un slēdžiem: krāsa nemainās uzreiz,
+   bet mīksti (0,15 s), kad uzbrauc ar peli, nospiež vai atzīmē.
+   ============================================================ */
+button,
+input,
+select,
+textarea {
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+a {
+  transition: color 0.15s;
+}
+
+/* Kategoriju skaitļi un ikonas (tās maina krāsu kopā ar kategoriju pogu) */
+.chip-skaits {
+  transition: background-color 0.15s, color 0.15s;
+}
+.chip-ikona {
+  transition: filter 0.15s;
+}
+
+/* Favorītu zvaigznīte: aizpildījums parādās mīksti */
+.zvaigzne-btn svg {
+  transition: fill 0.15s, stroke 0.15s;
+}
+
+/* Kartītes (favorīti, rezultātu kartīte) */
+.favorita-karte {
+  transition: box-shadow 0.15s, background-color 0.15s;
+}
+
+/* Pārslēdzot gaišo/tumšo režīmu, visas krāsas mainās mīksti (~0,3 s).
+   Klase "tema-pariet" tiek pielikta tikai uz brīdi no tema.js. */
+html.tema-pariet *,
+html.tema-pariet *::before,
+html.tema-pariet *::after {
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s,
+              fill 0.3s, stroke 0.3s, box-shadow 0.3s !important;
+}
+html.tema-pariet .leaflet-tile-pane {
+  transition: filter 0.3s !important;
+}
+
+/* Ja ierīcē ieslēgts "samazināt kustību", pārejas nav */
+@media (prefers-reduced-motion: reduce) {
+  button, input, select, textarea, a,
+  .chip-skaits, .chip-ikona, .zvaigzne-btn svg, .favorita-karte,
+  html.tema-pariet *, html.tema-pariet *::before, html.tema-pariet *::after,
+  html.tema-pariet .leaflet-tile-pane {
+    transition: none !important;
+  }
+}
