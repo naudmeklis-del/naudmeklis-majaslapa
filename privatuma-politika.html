@@ -4,7 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
-  <title>Privātuma politika – Naudmeklis</title>
+  <script src="tema.js"></script>
+  <title>Datu dzēšana – Naudmeklis</title>
+  <meta name="description" content="Kā izdzēst savu Naudmeklis kontu un visus ar to saistītos datus.">
   <!-- Fonts: DM Sans (Regular 400 un Bold 700) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,104 +18,46 @@
     h1 { color: #3C1955; }
     h2 { color: #3C1955; margin-top: 28px; font-size: 20px; }
     a { color: #5b2a9e; }
-    .aizpildit { background: #FFF3B0; padding: 0 4px; border-radius: 4px; }
-    .datums { color: #666; font-size: 14px; }
+    /* Tumšais izskats (to ieslēdz poga lapā ar karti; izvēle tiek atcerēta) */
+    :root[data-theme="dark"] { color-scheme: dark; }
+    :root[data-theme="dark"] body { background: #3C1955; color: #FAF5FA; }
+    :root[data-theme="dark"] main { background: #2A1140; }
+    :root[data-theme="dark"] h1,
+    :root[data-theme="dark"] h2 { color: #FAF5FA; }
+    :root[data-theme="dark"] a { color: #D9C2F5; }
+    :root[data-theme="dark"] .datums { color: #CDB9E6; }
   </style>
-  <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7750393781152096"
-     crossorigin="anonymous"></script> -->
 </head>
 <body>
 <main>
   <p><a href="index.html">&larr; Atpakaļ uz karti</a></p>
 
-  <h1>Privātuma politika</h1>
-  <p class="datums">Pēdējo reizi atjaunota: 21/11/2026</p>
+  <h1>Datu dzēšana</h1>
 
-  <p>Šī politika paskaidro, kā mājaslapa <b>Naudmeklis</b> (turpmāk – "Pakalpojums") apstrādā jūsu personas datus saskaņā ar Eiropas Savienības Vispārīgo datu aizsardzības regulu (GDPR) un Latvijas tiesību aktiem.</p>
+  <p>Šeit paskaidrots, kā izdzēst savu <b>Naudmeklis</b> kontu un visus ar to saistītos datus. Tas attiecas uz visiem kontiem, arī tiem, kas izveidoti, pieslēdzoties ar Google.</p>
 
-  <h2>1. Kas ir datu pārzinis</h2>
-  <p>
-    Naudmeklis<br>
-    Reģistrācijas Nr.: V20730052026<br>
-    Adrese: Skolas iela 11, Ragana, Krimuldas pagasts, Siguldas novads, LV-2144<br>
-    E-pasts jautājumiem par datiem: <a href="mailto:naudmeklis@gmail.com">naudmeklis@gmail.com</a>
-  </p>
+  <h2>Kā izdzēst kontu pašam</h2>
+  <ol>
+    <li>Atver <a href="index.html">naudmeklis.com</a> un pieslēdzies savam kontam.</li>
+    <li>Augšējā joslā nospied "Mans profils".</li>
+    <li>Loga apakšā nospied "Dzēst kontu".</li>
+    <li>Atzīmē, ka saproti, ka to nevar atsaukt, un apstiprini dzēšanu.</li>
+  </ol>
 
-  <h2>2. Kādus datus mēs apstrādājam</h2>
-  <p><b>Konta dati.</b> E-pasta adrese un parole. Parole tiek glabāta šifrētā (jaucējkoda) veidā pie autentifikācijas pakalpojuma sniedzēja, un mēs to nevaram redzēt. Uz jūsu e-pasta adresi tiek sūtīti arī reģistrācijas apstiprinājuma un paroles atjaunošanas e-pasti.</p>
-  <p><b>Haltūru (darba piedāvājumu) dati.</b> Nosaukums, kategorija, cena, apraksts, kontaktinformācija (tālruņa numurs vai e-pasts), atrašanās vietas koordinātas kartē, izveides laiks un nejaušs lietotāja identifikators.</p>
-  <p><b>Darba meklētāju sludinājumu dati</b> (sadaļa "Pievienot sevi"). Vārds, uzvārds (nav obligāts), kontaktinformācija (tālruņa numurs vai e-pasts), apraksts, aptuvenā vieta kartē, izveides laiks un nejaušs lietotāja identifikators.</p>
-  <p><b>Favorīti.</b> Ja haltūru atzīmējat ar zvaigznīti, mēs saglabājam saikni starp jūsu kontu un šo haltūru. Jūsu favorītus redzat tikai jūs.</p>
-  <p><b>Jūsu ierīces atrašanās vieta.</b> Ja pārlūkā to atļaujat, jūsu ierīces atrašanās vieta tiek izmantota tikai tam, lai kartē parādītu punktu "Tu esi šeit" un attālumu līdz sludinājumiem. Šī informācija tiek apstrādāta tikai jūsu ierīcē, mēs to nesaņemam un neglabājam.</p>
-  <p><b>Tehniskie dati.</b> IP adrese un pārlūka informācija, kas rodas, apmeklējot lapu. Šos datus apstrādā mūsu tehniskie pakalpojumu sniedzēji (skat. 6. punktu).</p>
-  <p><b>Ziņojumi par sludinājumiem.</b> Ja ziņojat par sludinājumu, mēs saglabājam jūsu konta identifikatoru, ziņojuma iemeslu un komentāru, laiku un nejaušu pārlūka identifikatoru. Ziņojot par haltūru, tiek saglabāts arī jūsu IP adreses nospiedums (hash), no kura pašu IP adresi atgūt nav iespējams. Šie dati tiek izmantoti, lai novērstu krāpšanu un ļaunprātīgu ziņošanu, piemēram, lai sludinājumu automātiski paslēptu tikai tad, ja ziņojumi nāk no vairākām atšķirīgām ierīcēm un lietotājiem. Ziņojumi tiek dzēsti kopā ar attiecīgo sludinājumu.</p>
-  <p>Mēs neprasām un nevēlamies saņemt īpašu kategoriju datus (piemēram, veselības vai politisko uzskatu datus). Lūdzam tos nerakstīt sludinājumos.</p>
-
-  <h2>3. Svarīgi: kas ir publiski un kas ne</h2>
-  <p><b>Redzams ikvienam apmeklētājam, arī bez reģistrācijas:</b></p>
+  <h2>Kas tiek izdzēsts</h2>
   <ul>
-    <li>haltūras nosaukums, kategorija, cena, apraksts un vieta kartē;</li>
-    <li>darba meklētāja <b>vārds, uzvārds</b> (ja tas norādīts), apraksts un aptuvenā vieta kartē.</li>
+    <li>tavs konts un e-pasta adrese;</li>
+    <li>visas tavas haltūras un darba meklētāja sludinājumi;</li>
+    <li>tavi favorīti;</li>
+    <li>tavi iesniegtie ziņojumi par sludinājumiem.</li>
   </ul>
-  <p><b>Redzams tikai reģistrētiem un pieslēgušamies lietotājiem:</b> sludinājumā norādītā kontaktinformācija (tālruņa numurs vai e-pasts). Nepieslēgtam apmeklētājam kontaktinformācija netiek nodota. Tomēr kontaktinformāciju var redzēt <b>ikviens, kas izveido kontu</b>, un mēs nevaram kontrolēt, ko viņi ar to dara. Norādiet tikai tādus kontaktus, kurus esat gatavs dot sazināšanās nolūkā.</p>
-  <p>Tāpēc kontaktinformāciju rakstiet <b>tikai tam paredzētajā laukā</b>, nevis sludinājuma nosaukumā vai aprakstā, jo tie ir publiski. Lūdzam arī <b>nenorādīt precīzu mājas adresi, bankas datus vai citu sensitīvu informāciju</b>, ja nevēlaties to padarīt publisku. Darba meklētājiem kartē ieteicams izvēlēties aptuvenu vietu, nevis precīzu dzīvesvietu.</p>
+  <p>Šo darbību nevar atsaukt.</p>
 
-  <h2>4. Kāpēc un uz kāda pamata mēs apstrādājam datus</h2>
-  <ul>
-    <li><b>Konta izveide, sludinājumu publicēšana, favorīti un kontaktinformācijas rādīšana reģistrētiem lietotājiem</b> – lai sniegtu Pakalpojumu (GDPR 6. panta 1. punkta b) apakšpunkts, līguma izpilde).</li>
-    <li><b>Drošība un ļaunprātīgas izmantošanas novēršana</b> (spams, krāpšana, ziņojumu apstrāde) – mūsu leģitīmās intereses (6. panta 1. punkta f) apakšpunkts).</li>
-    <li><b>Juridisko pienākumu izpilde</b> – ja to prasa normatīvie akti (6. panta 1. punkta c) apakšpunkts).</li>
-  </ul>
+  <h2>Ja nevari pieslēgties</h2>
+  <p>Ja nevari pieslēgties savam kontam, uzraksti uz <a href="mailto:naudmeklis@gmail.com">naudmeklis@gmail.com</a> no e-pasta adreses, ar kuru reģistrējies, un norādi, ka vēlies izdzēst kontu. Mēs atbildēsim mēneša laikā. Visus mūsu kontaktus skatiet lapā <a href="kontakti.html">Kontakti</a>.</p>
 
-  <h2>5. Cik ilgi glabājam datus</h2>
-  <ul>
-    <li><b>Sludinājumi</b> tiek automātiski dzēsti 10 dienas pēc to izveides. Jūs tos varat dzēst arī agrāk sadaļā "Mans profils".</li>
-    <li><b>Konta dati</b> tiek glabāti, kamēr konts pastāv. Kontu varat dzēst paši: sadaļā "Mans profils" nospiediet "Dzēst kontu". Tiks neatgriezeniski izdzēsts konts, visi jūsu sludinājumi (haltūras un darba meklētāja sludinājumi), favorīti un jūsu iesniegtie ziņojumi par sludinājumiem. Kontu var dzēst arī, uzrakstot uz <a href="mailto:naudmeklis@gmail.com">naudmeklis@gmail.com</a>.</li>
-    <li><b>Tehniskie žurnāli</b> tiek glabāti īsu laiku atbilstoši pakalpojumu sniedzēju noteikumiem.</li>
-  </ul>
-
-  <h2>6. Kam mēs nododam datus</h2>
-  <p>Mēs izmantojam trešo pušu pakalpojumus, kas apstrādā datus mūsu uzdevumā vai nodrošina lapas darbību:</p>
-  <ul>
-    <li><b>Supabase</b> – datubāze un lietotāju autentifikācija (glabā kontu, sludinājumu un favorītu datus; caur to tiek sūtīti arī apstiprinājuma un paroles atjaunošanas e-pasti). Servera atrašanās vieta: <span class="aizpildit">[REĢIONS, piem. ES]</span>.</li>
-    <li><b>GitHub Pages</b> (GitHub, Inc.) – hostinga pakalpojums, kas piegādā lapas failus.</li>
-    <li><b>OpenStreetMap</b> – kartes attēli. Lai tos ielādētu, jūsu pārlūks nosūta pieprasījumu OpenStreetMap serveriem, kuriem tādējādi kļūst zināma jūsu IP adrese un aptuvenais kartes apvidus, ko skatāties.</li>
-    <li><b>Google Fonts</b> – burtu veida (DM Sans) ielāde. Lai tos ielādētu, jūsu pārlūks nosūta pieprasījumu Google serveriem, kuriem tādējādi kļūst zināma jūsu IP adrese.</li>
-    <li><b>unpkg.com un cdn.jsdelivr.net</b> – satura piegādes tīkli, no kuriem lapa ielādē kartes (Leaflet) un datubāzes (Supabase) programmatūras bibliotēkas. Arī šo pakalpojumu serveriem kļūst zināma jūsu IP adrese.</li>
-  </ul>
-  <p>Ja dati tiek nodoti ārpus Eiropas Ekonomikas zonas, tas notiek, izmantojot GDPR paredzētos aizsardzības mehānismus (piemēram, Eiropas Komisijas standartklauzulas). Mēs nepārdodam jūsu datus.</p>
-
-  <h2>7. Sīkdatnes un lokālā glabāšana</h2>
-  <p>Pakalpojums izmanto tikai <b>nepieciešamo</b> pārlūka glabāšanu:</p>
-  <ul>
-    <li>lai jūs paliktu pieslēdzies, pārlūka atmiņā tiek saglabāta pieslēgšanās sesija;</li>
-    <li>nejaušs ierīces identifikators, kas tiek saglabāts pārlūka atmiņā un nosūtīts tikai tad, kad ziņojat par sludinājumu. Tas palīdz novērst ļaunprātīgu ziņošanu. To varat dzēst, iztīrot pārlūka datus.</li>
-  </ul>
-  <p>Mēs <b>neizmantojam</b> analītikas vai reklāmas sīkdatnes. Ja nākotnē tās pievienosim, atjaunosim šo politiku un lūgsim jūsu piekrišanu.</p>
-
-  <h2>8. Jūsu tiesības</h2>
-  <p>Jums ir tiesības:</p>
-  <ul>
-    <li>piekļūt saviem datiem un saņemt to kopiju;</li>
-    <li>labot neprecīzus datus (savus sludinājumus un kontaktus varat rediģēt paši sadaļā "Mans profils");</li>
-    <li>pieprasīt datu dzēšanu ("tiesības tikt aizmirstam"), ko varat izdarīt arī paši ar pogu "Dzēst kontu" sadaļā "Mans profils";</li>
-    <li>ierobežot apstrādi vai iebilst pret to;</li>
-    <li>datu pārnesamību;</li>
-    <li>jebkurā laikā atsaukt piekrišanu, ja apstrāde balstās uz piekrišanu.</li>
-  </ul>
-  <p>Lai izmantotu šīs tiesības, rakstiet uz <a href="mailto:naudmeklis@gmail.com">naudmeklis@gmail.com</a>. Mēs atbildēsim mēneša laikā. Ja uzskatāt, ka jūsu tiesības tiek pārkāptas, varat iesniegt sūdzību Latvijas uzraudzības iestādei – <b>Datu valsts inspekcijai</b> (<a href="https://www.dvi.gov.lv" target="_blank" rel="noopener">www.dvi.gov.lv</a>).</p>
-
-  <h2>9. Drošība</h2>
-  <p>Mēs izmantojam saprātīgus tehniskos un organizatoriskos pasākumus datu aizsardzībai (šifrēta savienojuma izmantošana, piekļuves kontrole datubāzē). Kontaktinformācija datubāzē ir pieejama tikai pieslēgtiem lietotājiem, nepieslēgti apmeklētāji to nevar saņemt. Tomēr neviena sistēma nav absolūti droša, un mēs nevaram garantēt pilnīgu drošību.</p>
-
-  <h2>10. Bērni</h2>
-  <p>Pakalpojums ir paredzēts personām, kuras sasniegušas 18 gadu vecumu. Mēs apzināti neapstrādājam nepilngadīgo datus. Ja uzzinām, ka konts pieder nepilngadīgajam, mēs to varam dzēst.</p>
-
-  <h2>11. Izmaiņas politikā</h2>
-  <p>Mēs varam laiku pa laikam atjaunot šo politiku. Aktuālā versija vienmēr ir pieejama šajā lapā ar norādītu atjaunošanas datumu.</p>
-
-  <h2>12. Kontakti</h2>
-  <p>Jautājumi par privātumu: <a href="mailto:naudmeklis@gmail.com">naudmeklis@gmail.com</a>. Visus mūsu kontaktus skatiet lapā <a href="kontakti.html">Kontakti</a>.</p>
+  <h2>Plašāk par datiem</h2>
+  <p>Kā mēs apstrādājam jūsu datus un cik ilgi tos glabājam, aprakstīts <a href="privatuma-politika.html">Privātuma politikā</a>.</p>
 
   <p><a href="lietosanas-noteikumi.html">Lietošanas noteikumi</a></p>
 </main>

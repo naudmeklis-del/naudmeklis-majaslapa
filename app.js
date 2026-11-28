@@ -1848,3 +1848,28 @@ dzestPoga.addEventListener('click', async function () {
   ieladetPinus();
   paradiPazinojumu('Tavs konts ir izdzēsts.', 4000);
 });
+
+
+// ---------- Logi aizveras, uzspiežot ārpus loga ----------
+// Uzspiežot uz tumšā fona ap logu, logs aizveras (tas pats, kas pogai "Aizvērt"/"Atcelt").
+// Ja peli nospiež logā (piem., iezīmējot tekstu) un atlaiž ārpus tā, logs NEaizveras.
+document.querySelectorAll('dialog').forEach(function (logs) {
+  var nospiestsArpus = false;
+
+  function irArpusLoga(e) {
+    var r = logs.getBoundingClientRect();
+    return e.clientX < r.left || e.clientX > r.right ||
+           e.clientY < r.top  || e.clientY > r.bottom;
+  }
+
+  logs.addEventListener('pointerdown', function (e) {
+    nospiestsArpus = (e.target === logs) && irArpusLoga(e);
+  });
+
+  logs.addEventListener('click', function (e) {
+    if (e.target === logs && nospiestsArpus && irArpusLoga(e)) {
+      logs.close();
+    }
+    nospiestsArpus = false;
+  });
+});

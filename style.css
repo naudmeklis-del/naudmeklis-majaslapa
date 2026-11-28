@@ -1395,3 +1395,420 @@ dialog textarea {
 .google-btn + .facebook-btn {
   margin-top: 8px;
 }
+
+
+/* ============================================================
+   GAIŠAIS / TUMŠAIS IZSKATS
+   Tumšais režīms ieslēdzas, kad <html> ir atribūts data-theme="dark"
+   (to pārslēdz poga #btn-tema, skat. tema.js).
+   Viss, kas ir augstāk failā, ir gaišais izskats un paliek nemainīts.
+   Tumšajā režīmā gaišā krāsa #FAF5FA tiek aizvietota ar #3C1955,
+   bet violetais teksts un pogas kļūst gaiši (#FAF5FA).
+
+   Tumšā režīma krāsas:
+     #3C1955  galvenā virsma (josla, paneļi, logi, kartīte)
+     #2A1140  dziļāka virsma (ievades lauki, profila kartītes)
+     #4F2B6E  gaišāka virsma (kategoriju pogas, cilnes)
+     #5E3A7D  līnijas un apmales
+     #FAF5FA  teksts un galvenās pogas
+     #CDB9E6  otrreizējais teksts
+   ============================================================ */
+
+/* ----- Poga gaišā/tumšā režīma pārslēgšanai ----- */
+.tema-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: #FAF5FA;
+  color: #3C1955;
+  border: 2px solid #3C1955;   /* tāds pats biezums kā pogām "Pieslēgties" un "Iziet" (pārlūka noklusējums 2px) */
+  border-radius: 10px;
+  cursor: pointer;
+}
+.tema-btn:hover {
+  background: #3C1955;
+  color: #FAF5FA;
+}
+.tema-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.tema-btn .tema-saule { display: none; }    /* gaišajā režīmā redzams mēness */
+@media (max-width: 700px) {
+  .josla > .josla-konts .tema-btn {
+    width: 34px;
+    height: 34px;
+    min-height: 34px;
+    padding: 0;
+  }
+}
+
+/* ----- Divi logotipi: gaišajam režīmam un tumšajam ----- */
+.logo-tumsa-tema { display: none; }
+
+/* ============ TUMŠAIS REŽĪMS ============ */
+html[data-theme="dark"] {
+  color-scheme: dark;
+}
+html[data-theme="dark"] body {
+  background: #2A1140;
+  color: #FAF5FA;
+}
+
+/* Logo: tumšajā režīmā rāda gaišo versiju */
+html[data-theme="dark"] .logo-gaisa-tema { display: none; }
+html[data-theme="dark"] .logo-tumsa-tema { display: block; }
+
+/* Poga režīma pārslēgšanai: tumšajā režīmā redzama saule */
+html[data-theme="dark"] .tema-btn {
+  background: transparent;
+  color: #FAF5FA;
+  border-color: #FAF5FA;
+}
+html[data-theme="dark"] .tema-btn:hover {
+  background: #D2AAF0;
+  color: #3C1955;
+}
+html[data-theme="dark"] .tema-btn .tema-menesis { display: none; }
+html[data-theme="dark"] .tema-btn .tema-saule { display: block; }
+
+/* ----- Augšējā josla un pogas ----- */
+html[data-theme="dark"] .josla {
+  background: #3C1955;
+  border-bottom-color: #5E3A7D;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+html[data-theme="dark"] .pievienot-btn,
+html[data-theme="dark"] .manisludinajumi-btn {
+  background: #D2AAF0;
+  color: #3C1955;
+}
+html[data-theme="dark"] .pievienot-btn:hover,
+html[data-theme="dark"] .manisludinajumi-btn:hover {
+  background: #BF8EE6;
+}
+html[data-theme="dark"] .pieslegties-btn,
+html[data-theme="dark"] .iziet-btn {
+  background: transparent;
+  color: #FAF5FA;
+  border-color: #FAF5FA;
+}
+html[data-theme="dark"] .pieslegties-btn:hover,
+html[data-theme="dark"] .iziet-btn:hover {
+  background: #D2AAF0;
+  color: #3C1955;
+}
+html[data-theme="dark"] .josla > .josla-konts button {
+  border-color: #FAF5FA;
+}
+@media (max-width: 700px) {
+  html[data-theme="dark"] #btn-filtri,
+  html[data-theme="dark"] #btn-mani {
+    background: #4F2B6E;
+    color: #FAF5FA;
+  }
+  html[data-theme="dark"] #btn-filtri:hover,
+  html[data-theme="dark"] #btn-mani:hover {
+    background: #5E3A7D;
+  }
+}
+
+/* ----- Filtru panelis ----- */
+html[data-theme="dark"] .filtri-panel {
+  background: #3C1955;
+  border-right-color: #5E3A7D;
+  color: #FAF5FA;
+}
+html[data-theme="dark"] .filtri-virsraksts,
+html[data-theme="dark"] .filtri-nosaukums {
+  color: #FAF5FA;
+}
+html[data-theme="dark"] .saite-btn { color: #E6D9F5; }
+html[data-theme="dark"] .saite-btn:hover { color: #fff; }
+
+html[data-theme="dark"] .filtri-panel input[type="text"],
+html[data-theme="dark"] .filtri-panel input[type="number"] {
+  background: #2A1140;
+  border-color: #5E3A7D;
+  color: #FAF5FA;
+}
+html[data-theme="dark"] .filtri-panel input::placeholder { color: #A892C4; }
+html[data-theme="dark"] .filtri-panel input[type="text"]:focus,
+html[data-theme="dark"] .filtri-panel input[type="number"]:focus {
+  border-color: #CDB9E6;
+  box-shadow: 0 0 0 3px rgba(205, 185, 230, 0.25);
+}
+html[data-theme="dark"] .cena-svitra { color: #A892C4; }
+
+/* Kategoriju pogas */
+html[data-theme="dark"] .chip {
+  background: #4F2B6E;
+  color: #FAF5FA;
+}
+html[data-theme="dark"] .chip:hover { background: #5E3A7D; }
+html[data-theme="dark"] .chip.aktivs {
+  background: #D2AAF0;
+  color: #3C1955;
+}
+html[data-theme="dark"] .chip.aktivs:hover { background: #BF8EE6; }
+html[data-theme="dark"] .chip-ikona { filter: brightness(0) invert(1); }
+html[data-theme="dark"] .chip.aktivs .chip-ikona { filter: brightness(0); }
+html[data-theme="dark"] .chip-skaits {
+  background: #3C1955;
+  color: #FAF5FA;
+}
+html[data-theme="dark"] .chip.aktivs .chip-skaits {
+  background: #3C1955;
+  color: #FAF5FA;
+}
+
+/* Slēdži (Rādīt darba piedāvājumus / meklētājus / apmaksātās) */
+html[data-theme="dark"] label:has(.ampaksats-check) { color: #FAF5FA; }
+html[data-theme="dark"] .ampaksats-check { background: #6B4789; }
+html[data-theme="dark"] .ampaksats-check:checked { background: #B58CE8; }
+
+/* ----- Karte ----- */
+html[data-theme="dark"] .leaflet-container { background: #241035; }
+html[data-theme="dark"] .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.9) saturate(0.8);
+}
+html[data-theme="dark"] .leaflet-bar a {
+  background-color: #3C1955;
+  color: #FAF5FA;
+  border-bottom-color: #5E3A7D;
+}
+html[data-theme="dark"] .leaflet-bar a:hover,
+html[data-theme="dark"] .leaflet-bar a:focus {
+  background-color: #4F2B6E;
+}
+html[data-theme="dark"] .leaflet-bar a.leaflet-disabled {
+  background-color: #2A1140;
+  color: #7C5A9A;
+}
+html[data-theme="dark"] .leaflet-container .leaflet-control-attribution {
+  background: rgba(42, 17, 64, 0.85);
+  color: #CDB9E6;
+}
+html[data-theme="dark"] .leaflet-container .leaflet-control-attribution a {
+  color: #D9C2F5;
+}
+
+/* Kartīte "Atrastas haltūras" */
+html[data-theme="dark"] .rezultatu-karte {
+  background: #3C1955;
+  color: #FAF5FA;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+html[data-theme="dark"] .rezultatu-ikona {
+  background: #4F2B6E;
+  color: #FAF5FA;
+}
+
+/* ----- Sludinājuma kartīte (logs uz pin'a) ----- */
+html[data-theme="dark"] .leaflet-popup-content-wrapper,
+html[data-theme="dark"] .leaflet-popup-tip {
+  background: #3C1955;
+  color: #FAF5FA;
+}
+html[data-theme="dark"] .sludinajuma-popup .leaflet-popup-content-wrapper {
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
+}
+html[data-theme="dark"] .leaflet-container a.leaflet-popup-close-button,
+html[data-theme="dark"] .sludinajuma-popup .leaflet-popup-close-button {
+  color: #E6D9F5;
+}
+html[data-theme="dark"] .leaflet-container a.leaflet-popup-close-button:hover {
+  color: #fff;
+}
+html[data-theme="dark"] .popup-nosaukums,
+html[data-theme="dark"] .popup-karte .popup-nosaukums {
+  color: #FAF5FA;
+}
+html[data-theme="dark"] .popup-cena { color: #3C1955; }
+html[data-theme="dark"] .popup-karte .popup-cena {
+  background: #D2AAF0;
+  color: #3C1955;
+}
+html[data-theme="dark"] .popup-karte .popup-kategorija {
+  background: #4F2B6E;
+  color: #FAF5FA;
+}
+html[data-theme="dark"] .popup-rinda { color: #CDB9E6; }
+html[data-theme="dark"] .popup-apraksts,
+html[data-theme="dark"] .popup-karte .popup-apraksts {
+  color: #E6DCEE;
+}
+html[data-theme="dark"] .popup-apakseja { border-top-color: #5E3A7D; }
+html[data-theme="dark"] .zinot-btn { color: #CDB9E6; }
+html[data-theme="dark"] .zinot-btn:hover { color: #FF9A9A; }
+html[data-theme="dark"] .zvaigzne-btn,
+html[data-theme="dark"] .zvaigzne-btn:hover {
+  color: #FAF5FA;
+}
+html[data-theme="dark"] .zvaigzne-btn:hover { background: #4F2B6E; }
+html[data-theme="dark"] .zvaigzne-btn.aktivs svg {
+  fill: #FFC400;
+  stroke: #FFD65C;
+}
+html[data-theme="dark"] .popup-kontakti,
+html[data-theme="dark"] .popup-kontakti a {
+  color: #FAF5FA;
+}
+html[data-theme="dark"] .kontakti-slegti { color: #D9C2F5; }
+
+/* Paziņojums ekrāna vidū */
+html[data-theme="dark"] .pazinojums-centra {
+  background: #D2AAF0;
+  color: #3C1955;
+}
+
+/* ----- Logi (dialog) ----- */
+html[data-theme="dark"] dialog {
+  background: #3C1955;
+  color: #FAF5FA;
+}
+html[data-theme="dark"] dialog::backdrop {
+  background: rgba(15, 4, 28, 0.6);
+}
+html[data-theme="dark"] dialog h3,
+html[data-theme="dark"] .authdialog-title {
+  color: #FAF5FA;
+}
+html[data-theme="dark"] dialog input,
+html[data-theme="dark"] dialog select,
+html[data-theme="dark"] dialog textarea {
+  background: #2A1140;
+  border-color: #5E3A7D;
+  color: #FAF5FA;
+}
+html[data-theme="dark"] dialog input::placeholder,
+html[data-theme="dark"] dialog textarea::placeholder {
+  color: #A892C4;
+}
+html[data-theme="dark"] dialog input:focus,
+html[data-theme="dark"] dialog select:focus,
+html[data-theme="dark"] dialog textarea:focus {
+  border-color: #CDB9E6;
+  box-shadow: 0 0 0 3px rgba(205, 185, 230, 0.25);
+}
+
+/* Pogas logos: gaišas uz tumša fona */
+html[data-theme="dark"] dialog button {
+  background: #D2AAF0;
+  color: #3C1955;
+}
+html[data-theme="dark"] dialog button:hover {
+  background: #BF8EE6;
+}
+/* ...bet saites-pogas ("Reģistrēties", "Aizmirsi paroli?") paliek kā saites */
+html[data-theme="dark"] dialog .auth-saite {
+  background: none;
+  color: #D9C2F5;
+}
+html[data-theme="dark"] dialog .auth-saite:hover {
+  background: none;
+  color: #fff;
+}
+/* Google poga paliek balta */
+html[data-theme="dark"] dialog .google-btn,
+html[data-theme="dark"] dialog .facebook-btn {
+  background: #fff;
+  color: #3c4043;
+  border-color: #dadce0;
+}
+html[data-theme="dark"] dialog .google-btn:hover,
+html[data-theme="dark"] dialog .facebook-btn:hover {
+  background: #f1f1f1;
+  color: #3c4043;
+}
+/* Dzēst kontu: sarkanas pogas */
+html[data-theme="dark"] dialog button.dzest-kontu-btn {
+  background: none;
+  color: #FF9A9A;
+  border-color: #FF9A9A;
+}
+html[data-theme="dark"] dialog button.dzest-kontu-btn:hover {
+  background: #8f1d1d;
+  color: #fff;
+}
+html[data-theme="dark"] dialog button.dzest-apstiprinat-btn,
+html[data-theme="dark"] dialog button.dzest-apstiprinat-btn:disabled {
+  background: #B02A2A;
+  color: #fff;
+}
+html[data-theme="dark"] dialog button.dzest-apstiprinat-btn:hover {
+  background: #8f1d1d;
+}
+
+/* Izvēle "Ko vēlies pievienot?" */
+html[data-theme="dark"] .izvele-pogas .izvele-poga {
+  background: #4F2B6E;
+  color: #FAF5FA;
+}
+html[data-theme="dark"] .izvele-pogas .izvele-poga:hover {
+  background: #5E3A7D;
+}
+html[data-theme="dark"] .izvele-apraksts { color: #CDB9E6; }
+html[data-theme="dark"] .sevi-padoms { color: #CDB9E6; }
+
+/* Pieslēgšanās / reģistrācijas logs */
+html[data-theme="dark"] .auth-lauks label { color: #FAF5FA; }
+html[data-theme="dark"] .auth-paskaidrojums { color: #E6DCEE; }
+html[data-theme="dark"] .auth-zinojums { color: #FF9A9A; }
+html[data-theme="dark"] .auth-zinojums.ok { color: #7EE08A; }
+html[data-theme="dark"] .auth-zinojums.info { color: #E6D9F5; }
+html[data-theme="dark"] #h-zinojums,
+html[data-theme="dark"] #s-zinojums,
+html[data-theme="dark"] #z-zinojums {
+  color: #FF9A9A;
+}
+html[data-theme="dark"] .auth-vai { color: #CDB9E6; }
+html[data-theme="dark"] .auth-vai::before,
+html[data-theme="dark"] .auth-vai::after {
+  background: #5E3A7D;
+}
+
+/* Profils: galva, cilnes, saraksti */
+html[data-theme="dark"] .profils-galva { background: #2A1140; }
+html[data-theme="dark"] .profils-avatars {
+  background: #D2AAF0;
+  color: #3C1955;
+}
+html[data-theme="dark"] .profils-epasts,
+html[data-theme="dark"] .profils-apaksvirsraksts {
+  color: #FAF5FA;
+}
+html[data-theme="dark"] .profils-vertejums { color: #CDB9E6; }
+html[data-theme="dark"] .profils-bistamais { border-top-color: #5E3A7D; }
+html[data-theme="dark"] .profils-tabi .profils-tab {
+  background: #4F2B6E;
+  color: #FAF5FA;
+}
+html[data-theme="dark"] .profils-tabi .profils-tab:hover { background: #5E3A7D; }
+html[data-theme="dark"] .profils-tabi .profils-tab.aktivs {
+  background: #D2AAF0;
+  color: #3C1955;
+}
+html[data-theme="dark"] .profils-tabi .profils-tab.aktivs:hover { background: #BF8EE6; }
+html[data-theme="dark"] .favorita-karte { background: #2A1140; }
+html[data-theme="dark"] .favorita-karte:hover { box-shadow: 0 0 0 2px #8E6BB0; }
+/* Sludinājumu rindu atdalītājs (tiek uzlikts no app.js, tāpēc vajag !important) */
+html[data-theme="dark"] #mani-saraksts > div {
+  border-bottom-color: #5E3A7D !important;
+}
+
+/* ----- Apakšējā josla ----- */
+html[data-theme="dark"] .footer {
+  background: #3C1955;
+  border-top-color: #5E3A7D;
+}
+html[data-theme="dark"] .footer a { color: #E6D9F5; }
+html[data-theme="dark"] .footer a + a::before { color: #7C5A9A; }

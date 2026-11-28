@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
+  <script src="tema.js"></script>
   <title>Kontakti – Naudmeklis</title>
   <!-- Fonts: DM Sans (Regular 400 un Bold 700) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,7 +17,14 @@
     h1 { color: #3C1955; }
     h2 { color: #3C1955; margin-top: 28px; font-size: 20px; }
     a { color: #5b2a9e; }
-    .aizpildit { background: #FFF3B0; padding: 0 4px; border-radius: 4px; }
+    /* Tumšais izskats (to ieslēdz poga lapā ar karti; izvēle tiek atcerēta) */
+    :root[data-theme="dark"] { color-scheme: dark; }
+    :root[data-theme="dark"] body { background: #3C1955; color: #FAF5FA; }
+    :root[data-theme="dark"] main { background: #2A1140; }
+    :root[data-theme="dark"] h1,
+    :root[data-theme="dark"] h2 { color: #FAF5FA; }
+    :root[data-theme="dark"] a { color: #D9C2F5; }
+    :root[data-theme="dark"] .datums { color: #CDB9E6; }
   </style>
   <!--<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7750393781152096"
      crossorigin="anonymous"></script>-->
