@@ -701,15 +701,16 @@ document.getElementById('login-forma').addEventListener('submit', async function
   forma.reset();
   authLogs.close();
 });
-// ---------- Pieslēgšanās ar Google ----------
-document.querySelectorAll('.google-btn').forEach(function (poga) {
+// ---------- Pieslēgšanās ar Google un Facebook ----------
+document.querySelectorAll('.google-btn, .facebook-btn').forEach(function (poga) {
   poga.addEventListener('click', async function () {
-    var vieta = poga.id === 'btn-google-reg' ? registerZinojums : loginZinojums;
+    var pakalpojums = poga.classList.contains('facebook-btn') ? 'facebook' : 'google';
+    var vieta = poga.id.indexOf('-reg') !== -1 ? registerZinojums : loginZinojums;
     var atgriesanasAdrese = window.location.origin + window.location.pathname.replace(/index\.html$/, '');
     var r;
     try {
       r = await sb.auth.signInWithOAuth({
-        provider: 'google',
+        provider: pakalpojums,
         options: { redirectTo: atgriesanasAdrese }
       });
     } catch (err) {
