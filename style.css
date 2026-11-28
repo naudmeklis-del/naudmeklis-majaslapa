@@ -1359,3 +1359,34 @@ dialog textarea {
     height: 70px;   /* was 45px */
   }
 }
+
+/* ===== Pieslēgšanās ar Google ===== */
+.auth-vai {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0 12px;
+  font-size: 14px;
+  color: #777;
+}
+.auth-vai::before,
+.auth-vai::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #ddd;
+}
+.google-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #fff;
+  color: #3c4043;
+  border: 1px solid #dadce0;
+}
+.google-btn:hover {
+  background: #f7f8f8;
+  color: #3c4043;
+}
