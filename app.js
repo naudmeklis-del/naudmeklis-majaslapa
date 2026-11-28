@@ -7,7 +7,7 @@ var sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // Vai lapa atvērta no e-pastā saņemtās saites? Jāpaņem uzreiz, kamēr Supabase vēl nav notīrījis adresi.
 var adresesDala = window.location.hash + window.location.search;
 var epastsApstiprinats = /[#&?]type=signup/.test(adresesDala);
-var saiteNederiga = /error_code=otp_expired|error=access_denied/.test(adresesDala);
+var saiteNederiga = /error_code=otp_expired/.test(adresesDala);
 
 
 // ========== 2. KARTE ==========
@@ -701,7 +701,23 @@ document.getElementById('login-forma').addEventListener('submit', async function
   forma.reset();
   authLogs.close();
 });
-
+// ---------- Pieslēgšanās ar Google ----------
+document.querySelectorAll('.google-btn').forEach(function (poga) {
+  poga.addEventListener('click', async function () {
+    var vieta = poga.id === 'btn-google-reg' ? registerZinojums : loginZinojums;
+    var atgriesanasAdrese = window.location.origin + window.location.pathname.replace(/index\.html$/, '');
+    var r;
+    try {
+      r = await sb.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: atgriesanasAdrese }
+      });
+    } catch (err) {
+      r = { error: err };
+    }
+    if (r.error) paradiZinojumu(vieta, latviskaKluda(r.error));
+  });
+});
 // ---------- Reģistrācija ----------
 document.getElementById('register-forma').addEventListener('submit', async function (e) {
   e.preventDefault();
